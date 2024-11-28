@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "T_BLOC")
+@Table(name = "TBLOC")
 @Getter
 @Setter
 @NoArgsConstructor
