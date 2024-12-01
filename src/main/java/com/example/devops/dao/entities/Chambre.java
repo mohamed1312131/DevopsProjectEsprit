@@ -1,4 +1,4 @@
-package com.example.devops.DAO.Entities;
+package com.example.devops.dao.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

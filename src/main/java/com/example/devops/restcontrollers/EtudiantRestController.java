@@ -1,7 +1,7 @@
-package com.example.devops.RestControllers;
+package com.example.devops.restcontrollers;
 
-import com.example.devops.DAO.Entities.Etudiant;
-import com.example.devops.Services.Etudiant.IEtudiantService;
+import com.example.devops.dao.entities.Etudiant;
+import com.example.devops.services.etudiant.IEtudiantService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

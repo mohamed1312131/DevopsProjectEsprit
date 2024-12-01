@@ -1,11 +1,11 @@
-package com.example.devops.Services.Reservation;
+package com.example.devops.services.reservation;
 
-import com.example.devops.DAO.Entities.Chambre;
-import com.example.devops.DAO.Entities.Etudiant;
-import com.example.devops.DAO.Entities.Reservation;
-import com.example.devops.DAO.Repositories.ChambreRepository;
-import com.example.devops.DAO.Repositories.EtudiantRepository;
-import com.example.devops.DAO.Repositories.ReservationRepository;
+import com.example.devops.dao.entities.Chambre;
+import com.example.devops.dao.entities.Etudiant;
+import com.example.devops.dao.entities.Reservation;
+import com.example.devops.dao.repositories.ChambreRepository;
+import com.example.devops.dao.repositories.EtudiantRepository;
+import com.example.devops.dao.repositories.ReservationRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

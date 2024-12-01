@@ -1,7 +1,7 @@
-package com.example.devops.DAO.Repositories;
+package com.example.devops.dao.repositories;
 
-import com.example.devops.DAO.Entities.Chambre;
-import com.example.devops.DAO.Entities.TypeChambre;
+import com.example.devops.dao.entities.Chambre;
+import com.example.devops.dao.entities.TypeChambre;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -35,7 +35,7 @@ public interface ChambreRepository extends JpaRepository<Chambre, Long> {
     long countChambreByTypeC(TypeChambre typeChambre);
 
     long countReservationsByIdChambreAndReservationsEstValideAndReservationsAnneeUniversitaireBetween(long idChambre, boolean estValide, LocalDate dateDebut, LocalDate dateFin);
-//    List<Chambre> findAllByNumeroChambre(List<Long> num);
+
 
     List<Chambre> findByBlocNomBloc(String nomB);
 

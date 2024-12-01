@@ -1,9 +1,9 @@
-package com.example.devops.Services.Foyer;
+package com.example.devops.services.foyer;
 
 
 
-import com.example.devops.DAO.Entities.Foyer;
-import com.example.devops.DAO.Entities.Universite;
+import com.example.devops.dao.entities.Foyer;
+import com.example.devops.dao.entities.Universite;
 
 import java.util.List;
 

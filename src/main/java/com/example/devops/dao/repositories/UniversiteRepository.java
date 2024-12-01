@@ -1,11 +1,8 @@
-package com.example.devops.DAO.Repositories;
+package com.example.devops.dao.repositories;
 
-import com.example.devops.DAO.Entities.Universite;
+import com.example.devops.dao.entities.Universite;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import java.time.LocalDate;
-import java.util.List;
 
 @Repository
 public interface UniversiteRepository extends JpaRepository<Universite, Long> {

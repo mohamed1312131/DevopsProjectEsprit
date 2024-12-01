@@ -1,9 +1,9 @@
-package com.example.devops.Services.Chambre;
+package com.example.devops.services.chambre;
 
 
 
-import com.example.devops.DAO.Entities.Chambre;
-import com.example.devops.DAO.Entities.TypeChambre;
+import com.example.devops.dao.entities.Chambre;
+import com.example.devops.dao.entities.TypeChambre;
 
 import java.util.List;
 

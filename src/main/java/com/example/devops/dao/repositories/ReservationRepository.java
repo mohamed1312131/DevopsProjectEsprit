@@ -1,6 +1,6 @@
-package com.example.devops.DAO.Repositories;
+package com.example.devops.dao.repositories;
 
-import com.example.devops.DAO.Entities.Reservation;
+import com.example.devops.dao.entities.Reservation;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 

@@ -1,6 +1,6 @@
-package com.example.devops.Services.Reservation;
+package com.example.devops.services.reservation;
 
-import com.example.devops.DAO.Entities.Reservation;
+import com.example.devops.dao.entities.Reservation;
 
 import java.time.LocalDate;
 import java.util.List;

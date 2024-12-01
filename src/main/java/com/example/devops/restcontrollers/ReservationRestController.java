@@ -1,7 +1,7 @@
-package com.example.devops.RestControllers;
+package com.example.devops.restcontrollers;
 
-import com.example.devops.DAO.Entities.Reservation;
-import com.example.devops.Services.Reservation.IReservationService;
+import com.example.devops.dao.entities.Reservation;
+import com.example.devops.services.reservation.IReservationService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

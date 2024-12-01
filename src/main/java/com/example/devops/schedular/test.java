@@ -1,9 +1,8 @@
-package com.example.devops.Schedular;
+package com.example.devops.schedular;
 
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -1,7 +1,7 @@
-package com.example.devops.DAO.Repositories;
+package com.example.devops.dao.repositories;
 
-import com.example.devops.DAO.Entities.Foyer;
-import com.example.devops.DAO.Entities.TypeChambre;
+import com.example.devops.dao.entities.Foyer;
+import com.example.devops.dao.entities.TypeChambre;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

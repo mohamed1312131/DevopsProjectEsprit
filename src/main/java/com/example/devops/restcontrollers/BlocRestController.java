@@ -1,7 +1,7 @@
-package com.example.devops.RestControllers;
+package com.example.devops.restcontrollers;
 
-import com.example.devops.DAO.Entities.Bloc;
-import com.example.devops.Services.Bloc.IBlocService;
+import com.example.devops.dao.entities.Bloc;
+import com.example.devops.services.bloc.IBlocService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

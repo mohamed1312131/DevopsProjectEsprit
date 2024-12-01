@@ -1,8 +1,8 @@
-package com.example.devops.RestControllers;
+package com.example.devops.restcontrollers;
 
-import com.example.devops.DAO.Entities.Chambre;
-import com.example.devops.DAO.Entities.TypeChambre;
-import com.example.devops.Services.Chambre.IChambreService;
+import com.example.devops.dao.entities.Chambre;
+import com.example.devops.dao.entities.TypeChambre;
+import com.example.devops.services.chambre.IChambreService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

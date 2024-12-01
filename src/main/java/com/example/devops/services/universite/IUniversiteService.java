@@ -1,8 +1,8 @@
-package com.example.devops.Services.Universite;
+package com.example.devops.services.universite;
 
 
 
-import com.example.devops.DAO.Entities.Universite;
+import com.example.devops.dao.entities.Universite;
 
 import java.util.List;
 

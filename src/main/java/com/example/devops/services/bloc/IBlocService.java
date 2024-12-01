@@ -1,8 +1,8 @@
-package com.example.devops.Services.Bloc;
+package com.example.devops.services.bloc;
 
 
 
-import com.example.devops.DAO.Entities.Bloc;
+import com.example.devops.dao.entities.Bloc;
 
 import java.util.List;
 

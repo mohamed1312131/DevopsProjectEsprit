@@ -1,6 +1,6 @@
-package com.example.devops.Services.Etudiant;
+package com.example.devops.services.etudiant;
 
-import com.example.devops.DAO.Entities.Etudiant;
+import com.example.devops.dao.entities.Etudiant;
 
 import java.util.List;
 

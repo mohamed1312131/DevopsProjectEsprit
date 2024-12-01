@@ -1,7 +1,7 @@
-package com.example.devops.Services.Etudiant;
+package com.example.devops.services.etudiant;
 
-import com.example.devops.DAO.Entities.Etudiant;
-import com.example.devops.DAO.Repositories.EtudiantRepository;
+import com.example.devops.dao.entities.Etudiant;
+import com.example.devops.dao.repositories.EtudiantRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

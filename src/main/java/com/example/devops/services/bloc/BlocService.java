@@ -1,10 +1,10 @@
-package com.example.devops.Services.Bloc;
-import com.example.devops.DAO.Entities.Bloc;
-import com.example.devops.DAO.Entities.Chambre;
-import com.example.devops.DAO.Entities.Foyer;
-import com.example.devops.DAO.Repositories.BlocRepository;
-import com.example.devops.DAO.Repositories.ChambreRepository;
-import com.example.devops.DAO.Repositories.FoyerRepository;
+package com.example.devops.services.bloc;
+import com.example.devops.dao.entities.Bloc;
+import com.example.devops.dao.entities.Chambre;
+import com.example.devops.dao.entities.Foyer;
+import com.example.devops.dao.repositories.BlocRepository;
+import com.example.devops.dao.repositories.ChambreRepository;
+import com.example.devops.dao.repositories.FoyerRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

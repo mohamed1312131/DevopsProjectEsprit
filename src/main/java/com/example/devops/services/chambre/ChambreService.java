@@ -1,15 +1,15 @@
-package com.example.devops.Services.Chambre;
+package com.example.devops.services.chambre;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import com.example.devops.DAO.Repositories.ChambreRepository;
-import com.example.devops.DAO.Repositories.BlocRepository;
-import com.example.devops.DAO.Entities.Chambre;
-import com.example.devops.DAO.Entities.TypeChambre;
-import com.example.devops.DAO.Entities.Reservation;
-import com.example.devops.DAO.Entities.Bloc;
+import com.example.devops.dao.repositories.ChambreRepository;
+import com.example.devops.dao.repositories.BlocRepository;
+import com.example.devops.dao.entities.Chambre;
+import com.example.devops.dao.entities.TypeChambre;
+import com.example.devops.dao.entities.Reservation;
+import com.example.devops.dao.entities.Bloc;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -147,7 +147,6 @@ public class ChambreService implements IChambreService {
         // Début "récuperer l'année universitaire actuelle"
         LocalDate dateDebutAU;
         LocalDate dateFinAU;
-        int numReservation;
         int year = LocalDate.now().getYear() % 100;
         if (LocalDate.now().getMonthValue() <= 7) {
             dateDebutAU = LocalDate.of(Integer.parseInt("20" + (year - 1)), 9, 15);
