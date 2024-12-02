@@ -2,6 +2,7 @@ package com.example.devops.services.etudiant;
 
 import com.example.devops.dao.entities.Etudiant;
 import com.example.devops.dao.repositories.EtudiantRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +26,7 @@ public class EtudiantService implements IEtudiantService {
 
     @Override
     public Etudiant findById(long id) {
-        return repo.findById(id).get();
+        return repo.findById(id).orElseThrow(() -> new EntityNotFoundException("Etudiant not found with id: " + id));
     }
 
     @Override

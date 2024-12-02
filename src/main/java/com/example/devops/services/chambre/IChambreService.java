@@ -15,10 +15,10 @@ public interface IChambreService {
     void delete(Chambre c);
     List<Chambre>  getChambresParNomBloc( String nomBloc);
     long  nbChambreParTypeEtBloc(TypeChambre type, long idBloc);
-    List<Chambre>  getChambresNonReserveParNomFoyerEtTypeChambre(String nomFoyer, TypeChambre type);
+
     void listeChambresParBloc();
     void pourcentageChambreParTypeChambre();
-    void nbPlacesDisponibleParChambreAnneeEnCours();
+
 
     List<Chambre> getChambresParNomBlocJava( String nomBloc);
     List<Chambre>getChambresParNomBlocKeyWord( String nomBloc);

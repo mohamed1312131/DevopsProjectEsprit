@@ -1,7 +1,7 @@
 package com.example.devops.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Contact;
+
 import io.swagger.v3.oas.models.info.Info;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
@@ -18,16 +18,10 @@ public class SpringDocConfig {
 
     public Info infoAPI() {
         return new Info().title("Gestion d'un foyer")
-                .description("TP étude de cas 2023-2024")
-                .contact(contactAPI());
+                .description("TP étude de cas 2023-2024");
     }
 
-    public Contact contactAPI() {
-        Contact contact = new Contact().name("Sirine NAIFAR")
-                .email("sirine.naifer@esprit.tn")
-                .url("https://www.linkedin.com/in/sirinenaifar/");
-        return contact;
-    }
+
 
     @Bean
     public GroupedOpenApi allPublicApi() {

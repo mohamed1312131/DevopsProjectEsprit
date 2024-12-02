@@ -2,6 +2,7 @@ package com.example.devops.services.universite;
 
 import com.example.devops.dao.entities.Universite;
 import com.example.devops.dao.repositories.UniversiteRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +26,7 @@ public class UniversiteService implements IUniversiteService {
 
     @Override
     public Universite findById(long id) {
-        return repo.findById(id).get();
+        return repo.findById(id).orElseThrow(() -> new EntityNotFoundException("Universite not found with id: " + id));
     }
 
     @Override

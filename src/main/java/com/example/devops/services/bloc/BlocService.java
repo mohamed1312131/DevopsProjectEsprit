@@ -5,6 +5,7 @@ import com.example.devops.dao.entities.Foyer;
 import com.example.devops.dao.repositories.BlocRepository;
 import com.example.devops.dao.repositories.ChambreRepository;
 import com.example.devops.dao.repositories.FoyerRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -48,12 +49,12 @@ public class BlocService implements IBlocService {
 
     @Override
     public Bloc findById(long id) {
-        return repo.findById(id).get();
+        return repo.findById(id).orElseThrow(() -> new EntityNotFoundException("Bloc not found with id: " + id));
     }
 
     @Override
     public void deleteById(long id) {
-        Bloc b =repo.findById(id).get();
+        Bloc b = findById(id);
         chambreRepository.deleteAll(b.getChambres());
         repo.delete(b);
     }

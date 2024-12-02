@@ -6,6 +6,8 @@ import com.example.devops.dao.entities.Reservation;
 import com.example.devops.dao.repositories.ChambreRepository;
 import com.example.devops.dao.repositories.EtudiantRepository;
 import com.example.devops.dao.repositories.ReservationRepository;
+import com.example.devops.services.chambre.ChambreService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,8 @@ public class ReservationService implements IReservationService {
     ReservationRepository repo;
     ChambreRepository chambreRepository;
     EtudiantRepository etudiantRepository;
+    ChambreService chambreService;
+
 
     @Override
     public Reservation addOrUpdate(Reservation r) {
@@ -34,7 +38,7 @@ public class ReservationService implements IReservationService {
 
     @Override
     public Reservation findById(String id) {
-        return repo.findById(id).get();
+        return repo.findById(id).orElseThrow(() -> new EntityNotFoundException("Reservation not found with id: " + id));
     }
 
     @Override
@@ -142,8 +146,8 @@ public class ReservationService implements IReservationService {
 
     @Override
     public void affectReservationAChambre(String idRes, long idChambre) {
-        Reservation r = repo.findById(idRes).get();
-        Chambre c = chambreRepository.findById(idChambre).get();
+        Reservation r = findById(idRes);
+        Chambre c = chambreService.findById(idChambre);
         // Parent: Chambre , Child: Reservation
         // On affecte le child au parent
         c.getReservations().add(r);
@@ -152,10 +156,8 @@ public class ReservationService implements IReservationService {
 
     @Override
     public void deaffectReservationAChambre(String idRes, long idChambre) {
-        Reservation r = repo.findById(idRes).get();
-        Chambre c = chambreRepository.findById(idChambre).get();
-        // Parent: Chambre , Child: Reservation
-        // On affecte le child au parent
+        Reservation r = findById(idRes);
+        Chambre c = chambreService.findById(idChambre);
         c.getReservations().remove(r);
         chambreRepository.save(c);
     }
@@ -165,7 +167,6 @@ public class ReservationService implements IReservationService {
         // Début "récuperer l'année universitaire actuelle"
         LocalDate dateDebutAU;
         LocalDate dateFinAU;
-        int numReservation;
         int year = LocalDate.now().getYear() % 100;
         if (LocalDate.now().getMonthValue() <= 7) {
             dateDebutAU = LocalDate.of(Integer.parseInt("20" + (year - 1)), 9, 15);
