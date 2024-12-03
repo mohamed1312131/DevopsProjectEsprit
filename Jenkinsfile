@@ -1,25 +1,22 @@
 pipeline {
     agent any
-    
+
     stages {
         stage('Build') {
             steps {
                 sh 'mvn clean compile'
             }
         }
-        stage('Test') {
+
+        stage('Run Tests') {
             steps {
+                // Run the tests
                 sh 'mvn test'
+                
+                junit 'target/surefire-reports/*.xml'
             }
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml'
-                }
-            }
-            failure {
-            echo 'Tests failed! Check the test report.'
-            }   
         }
+
         stage('SonarQube Analysis') {
             when {
                 branch 'main'
@@ -31,7 +28,7 @@ pipeline {
             }
         }
     }
-    
+
     post {
         always {
             echo "Building branch: ${env.BRANCH_NAME}"
