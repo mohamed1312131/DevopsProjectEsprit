@@ -21,6 +21,9 @@ public class BlocService implements IBlocService {
     BlocRepository blocRepository;
     FoyerRepository foyerRepository;
 
+
+
+
     @Override
     public Bloc addOrUpdate2(Bloc b) { //Cascade
         List<Chambre> chambres = b.getChambres();
