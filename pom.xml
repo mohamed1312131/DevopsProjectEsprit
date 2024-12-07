@@ -19,7 +19,7 @@
         <java.version>17</java.version>
         <sonar.host.url>http://192.168.33.10:9000</sonar.host.url> <!-- SonarQube server URL -->
         <sonar.projectKey>devops</sonar.projectKey> <!-- Set your project key -->
-        <sonar.login>sqp_1410dc7bd694b7f8ac65912cde411ad64f4bfe65</sonar.login> <!-- Replace with your SonarQube token -->
+        <sonar.token>sqa_48d924529d5fc7533ed7f1b5c888525270afbfb1</sonar.token> <!-- Replace with your SonarQube token -->
     </properties>
 
     <dependencies>
@@ -91,7 +91,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.10</version>
+                <version>0.8.12</version>
                 <executions>
                     <!-- Attach JaCoCo agent -->
                     <execution>
