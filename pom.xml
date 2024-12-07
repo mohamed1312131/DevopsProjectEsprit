@@ -19,7 +19,7 @@
         <java.version>17</java.version>
         <sonar.host.url>http://192.168.33.10:9000</sonar.host.url> <!-- SonarQube server URL -->
         <sonar.projectKey>devops</sonar.projectKey> <!-- Set your project key -->
-        <sonar.token>sqa_48d924529d5fc7533ed7f1b5c888525270afbfb1</sonar.token> <!-- Replace with your SonarQube token -->
+        <sonar.token>sqp_b2531ff87898fb60c6c61b410edd43ea2ba6f503</sonar.token> <!-- Replace with your SonarQube token -->
     </properties>
 
     <dependencies>
