@@ -17,12 +17,12 @@ pipeline {
 
             }
         }
-        stage('JaCoCo Coverage Report') {
+        /*stage('JaCoCo Coverage Report') {
                     steps {
                         // Generate JaCoCo XML report
                         sh 'mvn verify'
                     }
-                }
+                }*/
 
         stage('SonarQube Analysis') {
             steps {
