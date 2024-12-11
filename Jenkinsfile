@@ -10,19 +10,18 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                // Run the tests
+
                 sh 'mvn test'
                 
                 junit 'target/surefire-reports/*.xml'
 
             }
         }
-        /*stage('JaCoCo Coverage Report') {
+        stage('JaCoCo Coverage Report') {
                     steps {
-                        // Generate JaCoCo XML report
                         sh 'mvn verify'
                     }
-                }*/
+                }
 
         stage('SonarQube Analysis') {
             steps {
