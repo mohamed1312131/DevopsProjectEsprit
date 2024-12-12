@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         NEXUS_URL = 'http://192.168.50.4:8081/repository/maven-snapshots/'
-        NEXUS_CREDENTIALS = 'nexus-credentials-id' // Replace with your actual Jenkins credentials ID
+        NEXUS_CREDENTIALS = 'nexus' // Use the correct Jenkins credentials ID
         GROUP_ID = 'com.example'
         ARTIFACT_ID = 'devops'
         VERSION = '0.0.1-SNAPSHOT'
@@ -12,29 +12,25 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                // Clean and compile the project
                 sh 'mvn clean compile'
             }
         }
 
         stage('Run Tests') {
             steps {
-                // Run tests and collect the test results
                 sh 'mvn test'
-                junit 'target/surefire-reports/*.xml' // Collect test results
+                junit 'target/surefire-reports/*.xml'
             }
         }
 
         stage('JaCoCo Coverage Report') {
             steps {
-                // Generate and verify the code coverage report
                 sh 'mvn verify'
             }
         }
 
         stage('SonarQube Analysis') {
             steps {
-                // Run SonarQube analysis
                 withSonarQubeEnv('SonarQube') {
                     sh 'mvn sonar:sonar'
                 }
@@ -44,17 +40,13 @@ pipeline {
         stage('Deploy to Nexus') {
             steps {
                 script {
-                    // Define paths for the artifact and POM files
                     def artifactPath = "target/${ARTIFACT_ID}-${VERSION}.jar"
                     def pomPath = "target/${ARTIFACT_ID}-${VERSION}.pom"
 
-                    // Use Nexus credentials from Jenkins
                     withCredentials([usernamePassword(credentialsId: "${NEXUS_CREDENTIALS}",
-                                                       usernameVariable: 'admin',
-                                                       passwordVariable: 'admin')]) {
-                        // Check if the artifact and POM files exist before attempting deployment
+                                                       usernameVariable: 'NEXUS_USERNAME',
+                                                       passwordVariable: 'NEXUS_PASSWORD')]) {
                         if (fileExists(artifactPath) && fileExists(pomPath)) {
-                            // Deploy the artifact and POM file to Nexus repository
                             sh """
                             mvn deploy:deploy-file -Dfile=${artifactPath} \
                                                    -DpomFile=${pomPath} \
@@ -68,7 +60,6 @@ pipeline {
                                                    -Dpassword=${NEXUS_PASSWORD}
                             """
                         } else {
-                            // Fallback: Deploy only the .jar file if .pom is missing
                             sh """
                             mvn deploy:deploy-file -Dfile=${artifactPath} \
                                                    -DrepositoryId=nexus \
