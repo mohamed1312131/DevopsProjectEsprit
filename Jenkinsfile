@@ -42,18 +42,20 @@ pipeline {
 
         stage('Deploy to Nexus') {
             steps {
-                 sh 'echo $NEXUS_USERNAME'
-                 sh 'echo $NEXUS_PASSWORD'
+
                 script {
                     def artifactPath = "target/${ARTIFACT_ID}-${VERSION}.jar"
                     def pomPath = "target/${ARTIFACT_ID}-${VERSION}.pom"
 
                     // Use credentials from Jenkins
-                    withCredentials([usernamePassword(credentialsId: "${NEXUS_CREDENTIALS}",
-                                                       usernameVariable: 'NEXUS_USERNAME',
-                                                       passwordVariable: 'NEXUS_PASSWORD')]) {
+                   withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+
+                   }
+ {
                         if (fileExists(artifactPath) && fileExists(pomPath)) {
                             sh """
+                              sh 'echo $NEXUS_USERNAME'
+                                             sh 'echo $NEXUS_PASSWORD'
                             mvn deploy:deploy-file -Dfile=${artifactPath} \
                                                    -DpomFile=${pomPath} \
                                                    -DrepositoryId=nexus \
