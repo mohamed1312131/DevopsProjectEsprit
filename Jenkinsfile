@@ -9,6 +9,10 @@ pipeline {
         VERSION = '0.0.1-SNAPSHOT'
     }
 
+    sh 'echo $NEXUS_USERNAME'
+     sh 'echo $NEXUS_PASSWORD'
+
+
     stages {
         stage('Build') {
             steps {
