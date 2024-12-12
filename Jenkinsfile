@@ -9,8 +9,7 @@ pipeline {
         VERSION = '0.0.1-SNAPSHOT'
     }
 
-    sh 'echo $NEXUS_USERNAME'
-     sh 'echo $NEXUS_PASSWORD'
+
 
 
     stages {
@@ -43,6 +42,8 @@ pipeline {
 
         stage('Deploy to Nexus') {
             steps {
+                 sh 'echo $NEXUS_USERNAME'
+                 sh 'echo $NEXUS_PASSWORD'
                 script {
                     def artifactPath = "target/${ARTIFACT_ID}-${VERSION}.jar"
                     def pomPath = "target/${ARTIFACT_ID}-${VERSION}.pom"
