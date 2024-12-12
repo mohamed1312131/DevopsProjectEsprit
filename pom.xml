@@ -8,12 +8,6 @@
         <version>3.3.6</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-
-    <groupId>com.example</groupId>
-    <artifactId>devops</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>devops</name>
-    <description>DevOps project</description>
     <!-- Deploy to Nexus -->
     <distributionManagement>
         <repository>
@@ -22,6 +16,12 @@
             <url>http://localhost:8081/repository/maven-releases/</url>
         </repository>
     </distributionManagement>
+    <groupId>com.example</groupId>
+    <artifactId>devops</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>devops</name>
+    <description>DevOps project</description>
+
     <dependencies>
         <!-- Spring Boot and other dependencies -->
         <dependency>
