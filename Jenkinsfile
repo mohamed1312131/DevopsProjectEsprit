@@ -37,48 +37,45 @@ pipeline {
             }
         }
 
-        stage('Deploy to Nexus') {
-            steps {
-                script {
-                    def artifactPath = "target/${ARTIFACT_ID}-${VERSION}.jar"
-                    def pomPath = "target/${ARTIFACT_ID}-${VERSION}.pom"
+stage('Deploy to Nexus') {
+    steps {
+        script {
+            def artifactPath = "target/${ARTIFACT_ID}-${VERSION}.jar"
+            def pomPath = "target/${ARTIFACT_ID}-${VERSION}.pom"
 
-                    // Use credentials from Jenkins
-                    withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-                        if (fileExists(artifactPath) && fileExists(pomPath)) {
-                            sh """
-                                echo 'NEXUS_USERNAME: $NEXUS_USERNAME'
-                                echo 'NEXUS_PASSWORD: $NEXUS_PASSWORD'
-                                mvn deploy:deploy-file -Dfile=${artifactPath} \
-                                                       -DpomFile=${pomPath} \
-                                                       -DrepositoryId=nexus \
-                                                       -Durl=${NEXUS_URL} \
-                                                       -DgroupId=${GROUP_ID} \
-                                                       -DartifactId=${ARTIFACT_ID} \
-                                                       -Dversion=${VERSION} \
-                                                       -Dpackaging=jar \
-                                                       -Dusername=\${NEXUS_USERNAME} \
-                                                       -Dpassword=\${NEXUS_PASSWORD}
-                            """
-                        } else {
-                            sh """
-                                echo 'NEXUS_USERNAME: $NEXUS_USERNAME'
-                                echo 'NEXUS_PASSWORD: $NEXUS_PASSWORD'
-                                mvn deploy:deploy-file -Dfile=${artifactPath} \
-                                                       -DrepositoryId=nexus \
-                                                       -Durl=${NEXUS_URL} \
-                                                       -DgroupId=${GROUP_ID} \
-                                                       -DartifactId=${ARTIFACT_ID} \
-                                                       -Dversion=${VERSION} \
-                                                       -Dpackaging=jar \
-                                                       -Dusername=\${NEXUS_USERNAME} \
-                                                       -Dpassword=\${NEXUS_PASSWORD}
-                            """
-                        }
-                    }
+            // Use credentials from Jenkins
+            withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+                if (fileExists(artifactPath) && fileExists(pomPath)) {
+                    sh """
+                        mvn deploy:deploy-file -Dfile=${artifactPath} \
+                                               -DpomFile=${pomPath} \
+                                               -DrepositoryId=nexus \
+                                               -Durl=${NEXUS_URL} \
+                                               -DgroupId=${GROUP_ID} \
+                                               -DartifactId=${ARTIFACT_ID} \
+                                               -Dversion=${VERSION} \
+                                               -Dpackaging=jar \
+                                               -Dusername=${NEXUS_USERNAME} \
+                                               -Dpassword=${NEXUS_PASSWORD}
+                    """
+                } else {
+                    sh """
+                        mvn deploy:deploy-file -Dfile=${artifactPath} \
+                                               -DrepositoryId=nexus \
+                                               -Durl=${NEXUS_URL} \
+                                               -DgroupId=${GROUP_ID} \
+                                               -DartifactId=${ARTIFACT_ID} \
+                                               -Dversion=${VERSION} \
+                                               -Dpackaging=jar \
+                                               -Dusername=${NEXUS_USERNAME} \
+                                               -Dpassword=${NEXUS_PASSWORD}
+                    """
                 }
             }
         }
+    }
+}
+
     }
 
     post {
