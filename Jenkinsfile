@@ -62,7 +62,16 @@ pipeline {
                                                -Dpackaging=jar
                         """
                     } else {
-                        error "Artifact or POM file not found. Deployment failed."
+                        // Fallback: Deploy only the .jar file if .pom is missing
+                        sh """
+                        mvn deploy:deploy-file -Dfile=${artifactPath} \
+                                               -DrepositoryId=nexus \
+                                               -Durl=${NEXUS_URL} \
+                                               -DgroupId=${GROUP_ID} \
+                                               -DartifactId=${ARTIFACT_ID} \
+                                               -Dversion=${VERSION} \
+                                               -Dpackaging=jar
+                        """
                     }
                 }
             }
@@ -71,15 +80,12 @@ pipeline {
 
     post {
         always {
-            // Print the branch name after every build
             echo "Building branch: ${env.BRANCH_NAME}"
         }
         success {
-            // Notify if the build is successful
             echo 'Build succeeded!'
         }
         failure {
-            // Notify if the build fails
             echo 'Build failed!'
         }
     }
