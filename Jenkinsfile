@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         NEXUS_URL = 'http://192.168.50.4:8081/repository/maven-snapshots/'
-        NEXUS_CREDENTIALS = 'nexus' // Use the correct Jenkins credentials ID
+        NEXUS_CREDENTIALS = 'nexus' // Jenkins credentials ID
         GROUP_ID = 'com.example'
         ARTIFACT_ID = 'devops'
         VERSION = '0.0.1-SNAPSHOT'
@@ -43,6 +43,7 @@ pipeline {
                     def artifactPath = "target/${ARTIFACT_ID}-${VERSION}.jar"
                     def pomPath = "target/${ARTIFACT_ID}-${VERSION}.pom"
 
+                    // Use credentials from Jenkins
                     withCredentials([usernamePassword(credentialsId: "${NEXUS_CREDENTIALS}",
                                                        usernameVariable: 'NEXUS_USERNAME',
                                                        passwordVariable: 'NEXUS_PASSWORD')]) {
@@ -56,8 +57,8 @@ pipeline {
                                                    -DartifactId=${ARTIFACT_ID} \
                                                    -Dversion=${VERSION} \
                                                    -Dpackaging=jar \
-                                                   -Dusername=${NEXUS_USERNAME} \
-                                                   -Dpassword=${NEXUS_PASSWORD}
+                                                   -Dusername=\${NEXUS_USERNAME} \
+                                                   -Dpassword=\${NEXUS_PASSWORD}
                             """
                         } else {
                             sh """
@@ -68,8 +69,8 @@ pipeline {
                                                    -DartifactId=${ARTIFACT_ID} \
                                                    -Dversion=${VERSION} \
                                                    -Dpackaging=jar \
-                                                   -Dusername=${NEXUS_USERNAME} \
-                                                   -Dpassword=${NEXUS_PASSWORD}
+                                                   -Dusername=\${NEXUS_USERNAME} \
+                                                   -Dpassword=\${NEXUS_PASSWORD}
                             """
                         }
                     }
