@@ -1,12 +1,14 @@
 pipeline {
     agent any
-  environment {
+
+    environment {
         NEXUS_URL = 'http://192.168.50.4:8081/repository/maven-snapshots/'
         NEXUS_CREDENTIALS = 'nexus-credentials-id' // Replace with the actual Jenkins credentials ID
         GROUP_ID = 'com.example'
         ARTIFACT_ID = 'devops'
         VERSION = '0.0.1-SNAPSHOT'
     }
+
     stages {
         stage('Build') {
             steps {
@@ -16,18 +18,16 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-
                 sh 'mvn test'
-                
                 junit 'target/surefire-reports/*.xml'
-
             }
         }
+
         stage('JaCoCo Coverage Report') {
-                    steps {
-                        sh 'mvn verify'
-                    }
-                }
+            steps {
+                sh 'mvn verify'
+            }
+        }
 
         stage('SonarQube Analysis') {
             steps {
@@ -36,8 +36,8 @@ pipeline {
                 }
             }
         }
-    }
-  stage('Deploy to Nexus') {
+
+        stage('Deploy to Nexus') {
             steps {
                 script {
                     // Deploy artifact to Nexus repository
@@ -59,6 +59,7 @@ pipeline {
             }
         }
     }
+
     post {
         always {
             echo "Building branch: ${env.BRANCH_NAME}"
