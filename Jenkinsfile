@@ -30,11 +30,17 @@ pipeline {
                 }
             }
         }
-        stage('Nexus'){
-            step{
-                sh 'mvn deploy'
-            }
-        }
+        stage('Deploy to Nexus') {
+                    steps {
+                        withCredentials([usernamePassword(credentialsId: 'nexus-repo', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+                            sh """
+                                mvn deploy \
+                                -DaltDeploymentRepository=nexus-repo::default::http://192.168.33.10:8081/repository/myDevopsNexusRepo/ \
+                                -Dusername=$NEXUS_USERNAME \
+                                -Dpassword=$NEXUS_PASSWORD
+                            """
+                        }
+                    }
     }
 
     post {
