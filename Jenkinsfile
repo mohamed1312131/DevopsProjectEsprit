@@ -1,62 +1,97 @@
 pipeline {
     agent any
+     environment {
+        NEXUS_URL ="http://192.168.33.10:8081/"
+        NEXUS_REPOSITORY="myNexusRepo"
+        NEXUS_CREDENTIAL_ID = "nexus-repo"
+        ARTIFACT_VERSION = "${BUILD_NUMBER}"
 
+     }
     stages {
         stage('Build') {
             steps {
-                echo 'Starting build stage...'
                 sh 'mvn clean compile'
             }
         }
 
         stage('Run Tests') {
             steps {
-                echo 'Running tests...'
-                sh 'mvn test'
-                junit 'target/surefire-reports/*.xml'
-            }
-        }
 
-        stage('JaCoCo Coverage Report') {
-            steps {
-                echo 'Generating JaCoCo coverage report...'
-                sh 'mvn verify'
+                sh 'mvn test'
+
+                junit 'target/surefire-reports/*.xml'
+
             }
         }
+        stage('JaCoCo Coverage Report') {
+                    steps {
+                        sh 'mvn verify'
+                    }
+                }
 
         stage('SonarQube Analysis') {
             steps {
-                echo 'Running SonarQube analysis...'
                 withSonarQubeEnv('SonarQube') {
                     sh 'mvn sonar:sonar'
                 }
             }
         }
-
-        stage('Deploy to Nexus') {
-            steps {
-                echo 'Deploying artifacts to Nexus...'
-                withCredentials([usernamePassword(credentialsId: 'nexus-repo', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-                    sh """
-                        mvn deploy \
-                        -DaltDeploymentRepository=nexus-repo::default::http://192.168.33.10:8081/repository/myDevopsNexusRepo/ \
-                        -Dusername=$NEXUS_USERNAME \
-                        -Dpassword=$NEXUS_PASSWORD
-                    """
-                }
-            }
+        stage("mvn build") {
+                    steps {
+                        script {
+                            sh "mvn package"
+                        }
+                    }
         }
+                stage("publish to nexus") {
+                    steps {
+                        script {
+                            // Read POM xml file using 'readMavenPom' step , this step 'readMavenPom' is included in: https://plugins.jenkins.io/pipeline-utility-steps
+                            pom = readMavenPom file: "pom.xml";
+                            // Find built artifact under target folder
+                            filesByGlob = findFiles(glob: "target/*.${pom.packaging}");
+                            // Print some info from the artifact found
+                            echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
+                            // Extract the path from the File found
+                            artifactPath = filesByGlob[0].path;
+                            // Assign to a boolean response verifying If the artifact name exists
+                            artifactExists = fileExists artifactPath;
+
+                            if(artifactExists) {
+                                echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}";
+
+                                nexusArtifactUploader(
+                                    nexusUrl: NEXUS_URL,
+                                    groupId: pom.groupId,
+                                    version: ARTIFACT_VERSION,
+                                    repository: NEXUS_REPOSITORY,
+                                    credentialsId: NEXUS_CREDENTIAL_ID,
+                                    artifacts: [
+                                        // Artifact generated such as .jar, .ear and .war files.
+                                        [artifactId: pom.artifactId,
+                                        classifier: '',
+                                        file: artifactPath,
+                                        type: pom.packaging]
+                                    ]
+                                );
+
+                            } else {
+                                error "*** File: ${artifactPath}, could not be found";
+                            }
+                        }
+                    }
+                }
     }
 
     post {
         always {
-            echo "Pipeline completed for branch: ${env.BRANCH_NAME}"
+            echo "Building branch: ${env.BRANCH_NAME}"
         }
         success {
-            echo 'Build and deployment succeeded!'
+            echo 'Build succeeded!'
         }
         failure {
-            echo 'Build or deployment failed. Please check the logs.'
+            echo 'Build failed!'
         }
     }
 }
