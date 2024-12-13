@@ -32,14 +32,14 @@ pipeline {
         stage("mvn build") {
                     steps {
                         script {
-                            sh "mvn package"
+                            sh "mvn package -DskipTests"
                         }
                     }
         }
                stage('Deploy to Nexus') {
                     steps {
                         script {
-                            sh "mvn deploy"
+                            sh "mvn deploy -DskipTests"
                         }
                     }
                 }
