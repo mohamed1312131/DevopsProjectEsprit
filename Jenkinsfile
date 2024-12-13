@@ -2,11 +2,10 @@ pipeline {
     agent any
 
     environment {
-        NEXUS_URL = 'http://192.168.50.4:8081/repository/maven-snapshots/'
-        NEXUS_CREDENTIALS = 'nexus' // Jenkins credentials ID
-        GROUP_ID = 'com.example'
-        ARTIFACT_ID = 'devops'
-        VERSION = '0.0.1-SNAPSHOT'
+        ARTIFACT_ID = "devops"
+        GROUP_ID = "com.example"
+        VERSION = "0.0.1-SNAPSHOT"
+        NEXUS_URL = "http://192.168.50.4:8081/repository/maven-snapshots/"
     }
 
     stages {
@@ -37,45 +36,19 @@ pipeline {
             }
         }
 
-stage('Deploy to Nexus') {
-    steps {
-        script {
-            def artifactPath = "target/${ARTIFACT_ID}-${VERSION}.jar"
-            def pomPath = "target/${ARTIFACT_ID}-${VERSION}.pom"
-
-            // Use credentials from Jenkins
-            withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-                if (fileExists(artifactPath) && fileExists(pomPath)) {
-                    sh """
-                        mvn deploy:deploy-file -Dfile=${artifactPath} \
-                                               -DpomFile=${pomPath} \
-                                               -DrepositoryId=nexus \
-                                               -Durl=${NEXUS_URL} \
-                                               -DgroupId=${GROUP_ID} \
-                                               -DartifactId=${ARTIFACT_ID} \
-                                               -Dversion=${VERSION} \
-                                               -Dpackaging=jar \
-                                               -Dusername=${NEXUS_USERNAME} \
-                                               -Dpassword=${NEXUS_PASSWORD}
-                    """
-                } else {
-                    sh """
-                        mvn deploy:deploy-file -Dfile=${artifactPath} \
-                                               -DrepositoryId=nexus \
-                                               -Durl=${NEXUS_URL} \
-                                               -DgroupId=${GROUP_ID} \
-                                               -DartifactId=${ARTIFACT_ID} \
-                                               -Dversion=${VERSION} \
-                                               -Dpackaging=jar \
-                                               -Dusername=${NEXUS_USERNAME} \
-                                               -Dpassword=${NEXUS_PASSWORD}
-                    """
+        stage('Deploy to Nexus') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+                        sh """
+                            mvn deploy -DaltDeploymentRepository=nexus::default::${NEXUS_URL} \
+                                        -Dusername=${NEXUS_USERNAME} \
+                                        -Dpassword=${NEXUS_PASSWORD}
+                        """
+                    }
                 }
             }
         }
-    }
-}
-
     }
 
     post {
