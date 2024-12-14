@@ -6,6 +6,7 @@ pipeline {
         GROUP_ID = "com.example"
         VERSION = "0.0.1-SNAPSHOT"
         NEXUS_URL = "http://192.168.50.4:8081/repository/maven-snapshots/"
+        GRAFANA_URL = "http://192.168.50.4:3000/d/haryan-jenkins" // Update with your Grafana dashboard URL
     }
 
     stages {
@@ -57,9 +58,17 @@ pipeline {
         }
         success {
             echo 'Build succeeded!'
+            // Add Grafana dashboard link to build description
+            script {
+                currentBuild.description = "See build metrics in Grafana: <a href='${env.GRAFANA_URL}'>Grafana Dashboard</a>"
+            }
         }
         failure {
             echo 'Build failed!'
+            // Add Grafana dashboard link to build description
+            script {
+                currentBuild.description = "See build metrics in Grafana: <a href='${env.GRAFANA_URL}'>Grafana Dashboard</a>"
+            }
         }
     }
 
