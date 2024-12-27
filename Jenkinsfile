@@ -52,24 +52,43 @@ pipeline {
         }
     }
 
-    post {
-        always {
-            echo "Building branch: ${env.BRANCH_NAME}"
-        }
-        success {
-            echo 'Build succeeded!'
-            // Add Grafana dashboard link to build description
-            script {
-                currentBuild.description = "See build metrics in Grafana: <a href='${env.GRAFANA_URL}'>Grafana Dashboard</a>"
-            }
-        }
-        failure {
-            echo 'Build failed!'
-            // Add Grafana dashboard link to build description
-            script {
-                currentBuild.description = "See build metrics in Grafana: <a href='${env.GRAFANA_URL}'>Grafana Dashboard</a>"
-            }
-        }
-    }
+   post {
+          always {
+              echo "Building branch: ${env.BRANCH_NAME}"
+          }
+          success {
+              echo 'Build succeeded!'
+              script {
+                  currentBuild.description = "See build metrics in Grafana: <a href='${env.GRAFANA_URL}'>Grafana Dashboard</a>"
+              }
+              emailext(
+                  to: 'aziz.lachkar45@gmail.com',
+                  subject: "Build Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                  body: """
+                  <p>The build succeeded!</p>
+                  <p>Job: <a href="${env.BUILD_URL}">${env.JOB_NAME} #${env.BUILD_NUMBER}</a></p>
+                  <p>See build metrics in Grafana: <a href='${env.GRAFANA_URL}'>Grafana Dashboard</a></p>
+                  """,
+                  mimeType: 'text/html'
+              )
+          }
+          failure {
+              echo 'Build failed!'
+              script {
+                  currentBuild.description = "See build metrics in Grafana: <a href='${env.GRAFANA_URL}'>Grafana Dashboard</a>"
+              }
+              emailext(
+                  to: 'aziz.lachkar45@gmail.com',
+                  subject: "Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                  body: """
+                  <p>The build failed!</p>
+                  <p>Job: <a href="${env.BUILD_URL}">${env.JOB_NAME} #${env.BUILD_NUMBER}</a></p>
+                  <p>See build metrics in Grafana: <a href='${env.GRAFANA_URL}'>Grafana Dashboard</a></p>
+                  """,
+                  mimeType: 'text/html'
+              )
+          }
+      }
+  }
 
 }
