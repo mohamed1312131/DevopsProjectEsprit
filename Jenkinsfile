@@ -65,17 +65,19 @@ pipeline {
         stage('Docker Push') {
             steps {
                 script {
-                    echo "Pushing Docker image to registry..."
+                    echo "Logging into Docker..."
                     withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                         sh """
-                            echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin
-                            docker tag ${ARTIFACT_ID}:${VERSION} ${DOCKER_USERNAME}/${ARTIFACT_ID}:${VERSION}
-                            docker push ${DOCKER_USERNAME}/${ARTIFACT_ID}:${VERSION}
+                            echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin || exit 1
+                            docker images || exit 1
+                            docker tag ${ARTIFACT_ID}:${VERSION} ${DOCKER_USERNAME}/${ARTIFACT_ID}:${VERSION} || exit 1
+                            docker push ${DOCKER_USERNAME}/${ARTIFACT_ID}:${VERSION} || exit 1
                         """
                     }
                 }
             }
         }
+
     }
 
     post {
