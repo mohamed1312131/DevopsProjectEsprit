@@ -50,33 +50,34 @@ pipeline {
                 }
             }
         }
-    }
-      stage('Docker Build') {
-                steps {
-                    script {
-                        echo "Building Docker image..."
+
+        stage('Docker Build') {
+            steps {
+                script {
+                    echo "Building Docker image..."
+                    sh """
+                        docker build -t ${ARTIFACT_ID}:${VERSION} .
+                    """
+                }
+            }
+        }
+
+        stage('Docker Push') {
+            steps {
+                script {
+                    echo "Pushing Docker image to registry..."
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                         sh """
-                            docker build -t ${ARTIFACT_ID}:${VERSION} .
+                            echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin
+                            docker tag ${ARTIFACT_ID}:${VERSION} ${DOCKER_USERNAME}/${ARTIFACT_ID}:${VERSION}
+                            docker push ${DOCKER_USERNAME}/${ARTIFACT_ID}:${VERSION}
                         """
                     }
                 }
             }
-
-            stage('Docker Push') {
-                steps {
-                    script {
-                        echo "Pushing Docker image to registry..."
-                        withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                            sh """
-                                echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin
-                                docker tag ${ARTIFACT_ID}:${VERSION} ${DOCKER_USERNAME}/${ARTIFACT_ID}:${VERSION}
-                                docker push ${DOCKER_USERNAME}/${ARTIFACT_ID}:${VERSION}
-                            """
-                        }
-                    }
-                }
-            }
         }
+    }
+
     post {
         always {
             echo "Building branch: ${env.BRANCH_NAME}"
@@ -114,5 +115,4 @@ pipeline {
             )
         }
     }
-
 }
