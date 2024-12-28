@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Manage Foyers</title>
+</head>
+<body>
+<h1>Foyer Management</h1>
+<form id="foyerForm">
+    <label for="nomFoyer">Foyer Name:</label>
+    <input type="text" id="nomFoyer" name="nomFoyer">
+    <label for="capaciteFoyer">Foyer Capacity:</label>
+    <input type="number" id="capaciteFoyer" name="capaciteFoyer">
+    <label for="universite">University Name:</label>
+    <input type="text" id="universite" name="universite"> <!-- Send the name or id -->
+    <button type="submit">Add Foyer</button>
+</form>
+<hr>
+<h2>Existing Foyers</h2>
+<ul>
+    <li th:each="foyer : ${foyers}">
+        <h3>Foyer Name: <span th:text="${foyer.nomFoyer}"></span></h3>
+        <p>Foyer Capacity: <span th:text="${foyer.capaciteFoyer}"></span></p>
+        <p>University Name: <span th:text="${foyer.universite?.nomUniversite ?: 'No University'}"></span></p>
+        <p>Address: <span th:text="${foyer.universite?.adresse ?: 'No Address'}"></span></p>
+        <h4>Blocs:</h4>
+        <ul>
+            <li th:each="bloc : ${foyer.blocs}" th:text="${bloc.nomBloc}"></li>
+        </ul>
+    </li>
+</ul>
+
+
+<script>
+    document.getElementById("foyerForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        const nomFoyer = document.getElementById("nomFoyer").value;
+        const capaciteFoyer = document.getElementById("capaciteFoyer").value;
+        const universite = document.getElementById("universite").value; // Send name or id of the university
+
+        const payload = {
+            nomFoyer: nomFoyer,
+            capaciteFoyer: capaciteFoyer,
+            universite: {
+                nomUniversite: universite // Adjust if you're sending ID instead
+            }
+        };
+
+        fetch('/foyer/addOrUpdate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data); // Optionally handle success
+                // Refresh the foyer list after adding a new foyer
+                fetchFoyers();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    });
+
+    function fetchFoyers() {
+        fetch('/foyer/findAll')
+            .then(response => response.json())
+            .then(data => {
+                const foyerList = document.querySelector('ul');
+                foyerList.innerHTML = ''; // Clear the existing list
+
+                data.forEach(foyer => {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `
+                    <h3>Foyer Name: ${foyer.nomFoyer}</h3>
+                    <p>Foyer Capacity: ${foyer.capaciteFoyer}</p>
+                    <p>University Name: ${foyer.universite?.nomUniversite || 'No University'}</p>
+                    <p>Address: ${foyer.universite?.adresse || 'No Address'}</p>
+                    <h4>Blocs:</h4>
+                    <ul>
+                        ${(foyer.blocs || []).map(bloc => `<li>${bloc.nomBloc}</li>`).join('')}
+                    </ul>
+                `;
+                    foyerList.appendChild(listItem);
+                });
+            })
+            .catch(error => console.error('Error fetching foyers:', error));
+    }
+
+</script>
+
+
+</body>
+</html>

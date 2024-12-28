@@ -23,6 +23,18 @@ pipeline {
             }
         }
 
+        stage('UI Tests - Selenium') {
+            steps {
+                script {
+                    echo "Running Selenium UI tests..."
+                    sh """
+                        mvn test -Dtest=com.example.devops.UITest.FoyerUITest
+                    """
+                }
+                junit 'target/surefire-reports/*.xml'
+            }
+        }
+
         stage('JaCoCo Coverage Report') {
             steps {
                 sh 'mvn verify'
@@ -77,7 +89,6 @@ pipeline {
                 }
             }
         }
-
     }
 
     post {

@@ -11,48 +11,46 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-
 import java.util.List;
 
 @Service
 @AllArgsConstructor
 public class FoyerService implements IFoyerService {
     private final FoyerRepository foyerRepository;
-    FoyerRepository repo;
-    UniversiteRepository universiteRepository;
-    BlocRepository blocRepository;
-    UniversiteService universiteService;
+    private final UniversiteRepository universiteRepository;
+    private final BlocRepository blocRepository;
+    private final UniversiteService universiteService;
 
     @Override
     public Foyer addOrUpdate(Foyer f) {
-        return repo.save(f);
+        f.setUniversite(null);
+        return foyerRepository.save(f);
     }
 
     @Override
     public List<Foyer> findAll() {
-        return repo.findAll();
+        return foyerRepository.findAll();
     }
 
     @Override
     public Foyer findById(long id) {
-        return repo.findById(id).orElseThrow(() -> new EntityNotFoundException("Foyer not found with id: " + id));
+        return foyerRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Foyer not found with id: " + id));
     }
 
     @Override
     public void deleteById(long id) {
-        repo.deleteById(id);
+        foyerRepository.deleteById(id);
     }
 
     @Override
     public void delete(Foyer f) {
-        repo.delete(f);
+        foyerRepository.delete(f);
     }
 
     @Override
     public Universite affecterFoyerAUniversite(long idFoyer, String nomUniversite) {
-       Foyer f = findById(idFoyer); // Child
-        Universite u = universiteRepository.findByNomUniversite(nomUniversite); // Parent
-        // On affecte le child au parent
+        Foyer f = findById(idFoyer);
+        Universite u = universiteRepository.findByNomUniversite(nomUniversite);
         u.setFoyer(f);
         return universiteRepository.save(u);
     }
@@ -66,15 +64,11 @@ public class FoyerService implements IFoyerService {
 
     @Override
     public Foyer ajouterFoyerEtAffecterAUniversite(Foyer foyer, long idUniversite) {
-        // Récuperer la liste des blocs avant de faire l'ajout
         List<Bloc> blocs = foyer.getBlocs();
-        // Foyer est le child et universite est parent
-        Foyer f = repo.save(foyer);
+        Foyer f = foyerRepository.save(foyer);
         Universite u = universiteService.findById(idUniversite);
-        // Foyer est le child et bloc est le parent
-        //On affecte le child au parent
         for (Bloc bloc : blocs) {
-            bloc.setFoyer(foyer);
+            bloc.setFoyer(f);
             blocRepository.save(bloc);
         }
         u.setFoyer(f);
@@ -84,7 +78,7 @@ public class FoyerService implements IFoyerService {
     @Override
     public Foyer ajoutFoyerEtBlocs(Foyer foyer) {
         List<Bloc> blocs = foyer.getBlocs();
-        foyer = repo.save(foyer);
+        foyer = foyerRepository.save(foyer);
         for (Bloc b : blocs) {
             b.setFoyer(foyer);
             blocRepository.save(b);
@@ -94,10 +88,9 @@ public class FoyerService implements IFoyerService {
 
     @Override
     public Universite affecterFoyerAUniversite(long idF, long idU) {
-        Universite u= universiteService.findById(idU);
-        Foyer f= foyerRepository.findById(idF).orElseThrow(() -> new EntityNotFoundException("Foyer not found with id: " + idF));
+        Universite u = universiteService.findById(idU);
+        Foyer f = foyerRepository.findById(idF).orElseThrow(() -> new EntityNotFoundException("Foyer not found with id: " + idF));
         u.setFoyer(f);
         return universiteRepository.save(u);
     }
-
 }
