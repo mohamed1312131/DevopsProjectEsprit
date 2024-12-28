@@ -1,6 +1,8 @@
 package com.example.devops.UITest;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.annotations.Test;
 
@@ -13,13 +15,20 @@ public class FoyerUITest {
         WebDriver driver = new ChromeDriver();
 
         // Navigate to the UI
-        driver.get("http://localhost:8080/foyer");
+        try {
+            // Navigate to the UI
+            driver.get("http://localhost:8080/foyer");
 
-        // Perform assertions (example)
-        String title = driver.getTitle();
-        assert title.equals("Manage Foyers");
+            // Validate page title
+            String title = driver.getTitle();
+            assert title.equals("Manage Foyers") : "Page title does not match";
 
-        // Close the browser
-        driver.quit();
-    }
+            // Validate an element on the page (example: check for a header)
+            WebElement header = driver.findElement(By.tagName("h1"));
+            assert header.getText().equals("Welcome to the Foyer Management System") : "Header text does not match";
+
+        } finally {
+            // Ensure the browser is closed
+            driver.quit();
+        }}
 }
