@@ -9,7 +9,7 @@ public class FoyerUITest {
     @Test
     public void testFoyerPage() {
         // Set up WebDriver
-        System.setProperty("webdriver.chrome.driver", "path/to/chromedriver");
+        System.setProperty("webdriver.chrome.driver", "C:/Users/Ma9rouna/OneDrive/Bureau/DevOps/chromedriver-win64");
         WebDriver driver = new ChromeDriver();
 
         // Navigate to the UI
