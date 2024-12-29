@@ -53,6 +53,7 @@ pipeline {
                                    mvn test -Dtest=com.example.devops.UITest.* -Dwebdriver.chrome.driver=\$CHROME_DRIVER_PATH -Dselenium.headless=true
                                """
                            }
+                 }
         }
 
         stage('JaCoCo Coverage Report') {
