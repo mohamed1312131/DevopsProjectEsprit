@@ -21,7 +21,6 @@ pipeline {
         stage('Run Tests') {
             steps {
                 // Exclude Selenium UI tests using Maven's exclude option
-                sh 'mvn test -Dtest=!com.example.devops.UITest.*'
                 sh """
                                         echo "Debugging Environment Variables:"
                                         echo "CHROME_DRIVER_PATH: \$CHROME_DRIVER_PATH"
@@ -42,6 +41,7 @@ pipeline {
                                         echo "Running Maven Selenium tests..."
                                         mvn test -Dtest=com.example.devops.UITest.* -Dwebdriver.chrome.driver=\$CHROME_DRIVER_PATH -Dselenium.headless=true
                                     """
+                sh 'mvn test -Dtest=!com.example.devops.UITest.*'
 
                 junit 'target/surefire-reports/*.xml'
             }
