@@ -7,6 +7,7 @@ pipeline {
         VERSION = "0.0.1-SNAPSHOT"
         NEXUS_URL = "http://192.168.50.4:8081/repository/maven-snapshots/"
         GRAFANA_URL = "http://192.168.50.4:3000/d/haryan-jenkins"
+        DISPLAY = ":99"  // For running headless browsers if needed (X virtual framebuffer)
     }
 
     stages {
@@ -27,8 +28,11 @@ pipeline {
             steps {
                 script {
                     echo "Running Selenium UI tests..."
+                    // Ensure you're running tests in headless mode (for example, Chrome)
                     sh """
-                        mvn test -Dtest=com.example.devops.UITest.FoyerUITest
+                        # Set up the headless browser environment
+                        export DISPLAY=:99  # For Xvfb (X virtual framebuffer) if needed
+                        mvn test -Dtest=com.example.devops.UITest.FoyerUITest -Dselenium.headless=true
                     """
                 }
                 junit 'target/surefire-reports/*.xml'

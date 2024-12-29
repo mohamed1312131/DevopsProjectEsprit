@@ -1,0 +1,9 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="DevOps Project Suite">
+
+    <test name="UI Tests">
+        <classes>
+            <class name="com.example.devops.UITest.FoyerUITest" />
+        </classes>
+    </test>
+</suite>

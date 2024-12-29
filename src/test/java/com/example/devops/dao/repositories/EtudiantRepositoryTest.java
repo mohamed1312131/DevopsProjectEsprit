@@ -2,6 +2,7 @@ package com.example.devops.dao.repositories;
 
 import com.example.devops.dao.entities.Etudiant;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -12,8 +13,9 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-public class EtudiantRepositoryTest {
+@Tag("unit")
 
+public class EtudiantRepositoryTest {
     @Autowired
     private EtudiantRepository etudiantRepository;
 
