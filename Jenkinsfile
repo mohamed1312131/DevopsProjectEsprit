@@ -18,59 +18,20 @@ pipeline {
             }
         }
 
-       stage('Run Tests') {
-           steps {
-               // Exclude Selenium UI tests using Maven's exclude option
-               script {
-                          // Debugging Environment Variables with escaped dollar signs
-                             echo "Debugging Environment Variables:"
-                             echo "CHROME_DRIVER_PATH: \$CHROME_DRIVER_PATH"
-                             echo "PATH: \$PATH"
-                             echo "DISPLAY: \$DISPLAY"
-                             echo "Current User: \$(whoami)" // Escape the dollar signs for shell commands
+        // JUnit Tests Stage
+        stage('Run Tests') {
+            steps {
+                sh 'mvn test'  // This runs the JUnit tests
+                junit 'target/surefire-reports/*.xml'  // Collect test results
+            }
+        }
 
-                             // Checking ChromeDriver version
-                             echo "Checking ChromeDriver version:"
-                             sh "chromedriver --version || { echo 'ChromeDriver not found or not executable!'; exit 1; }"
-
-                             // Checking Google Chrome version
-                             echo "Checking Google Chrome version:"
-                             sh "google-chrome --version || { echo 'Google Chrome not found or not executable!'; exit 1; }"
-
-                             // Setting up the headless environment
-                             echo "Setting up headless environment..."
-                             sh "export DISPLAY=:99"
-                             sh "Xvfb :99 -screen 0 1024x768x24 &"
-                             sh "sleep 3"
-
-                   echo "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                   // Run all tests excluding Selenium UI tests
-                   sh """
-                       mvn test -Dtest=com.example.devops.UITest.FoyerUITest \
-                                -Dwebdriver.chrome.driver=${env.CHROME_DRIVER_PATH} \
-                                -Dselenium.headless=true
-                   """
-               }
-               junit 'target/surefire-reports/*.xml'
-           }
-       }
-
+        // UI Tests - Selenium Stage
         stage('UI Tests - Selenium') {
             steps {
                 script {
                     echo "Running Selenium UI tests..."
                     sh """
-                        echo "Debugging Environment Variables:"
-                        echo "CHROME_DRIVER_PATH: \$CHROME_DRIVER_PATH"
-                        echo "PATH: \$PATH"
-                        echo "DISPLAY: \$DISPLAY"
-                        echo "Current User: \$(whoami)"
-
-                        echo "Checking ChromeDriver version:"
-                        chromedriver --version || { echo "ChromeDriver not found or not executable!"; exit 1; }
-                        echo "Checking Google Chrome version:"
-                        google-chrome --version || { echo "Google Chrome not found or not executable!"; exit 1; }
-
                         echo "Setting up headless environment..."
                         export DISPLAY=:99
                         Xvfb :99 -screen 0 1024x768x24 &
@@ -80,7 +41,7 @@ pipeline {
                         mvn test -Dtest=com.example.devops.UITest.* -Dwebdriver.chrome.driver=\$CHROME_DRIVER_PATH -Dselenium.headless=true
                     """
                 }
-                junit 'target/surefire-reports/*.xml'
+                junit 'target/surefire-reports/*.xml'  // Collect test results for Selenium tests
             }
         }
 
