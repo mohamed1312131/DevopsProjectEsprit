@@ -21,7 +21,7 @@ pipeline {
         // JUnit Tests Stage
         stage('Run Tests') {
             steps {
-//                 sh 'mvn test'  // This runs the JUnit tests
+                // Exclude FoyerUITest but run all other tests
                 sh 'mvn test -Dtest=!com.example.devops.UITest.FoyerUITest'
                 junit 'target/surefire-reports/*.xml'  // Collect test results
             }
@@ -29,31 +29,32 @@ pipeline {
 
         // UI Tests - Selenium Stage
         stage('UI Tests - Selenium') {
-             steps {
-                           script {
-                               echo "Running Selenium UI tests..."
-                               sh """
-                                   echo "Debugging Environment Variables:"
-                                   echo "CHROME_DRIVER_PATH: \$CHROME_DRIVER_PATH"
-                                   echo "PATH: \$PATH"
-                                   echo "DISPLAY: \$DISPLAY"
-                                   echo "Current User: \$(whoami)"
+            steps {
+                script {
+                    echo "Running Selenium UI tests..."
+                    sh """
+                        echo "Debugging Environment Variables:"
+                        echo "CHROME_DRIVER_PATH: \$CHROME_DRIVER_PATH"
+                        echo "PATH: \$PATH"
+                        echo "DISPLAY: \$DISPLAY"
+                        echo "Current User: \$(whoami)"
 
-                                   echo "Checking ChromeDriver version:"
-                                   chromedriver --version || { echo "ChromeDriver not found or not executable!"; exit 1; }
-                                   echo "Checking Google Chrome version:"
-                                   google-chrome --version || { echo "Google Chrome not found or not executable!"; exit 1; }
+                        echo "Checking ChromeDriver version:"
+                        chromedriver --version || { echo "ChromeDriver not found or not executable!"; exit 1; }
+                        echo "Checking Google Chrome version:"
+                        google-chrome --version || { echo "Google Chrome not found or not executable!"; exit 1; }
 
-                                   echo "Setting up headless environment..."
-                                   export DISPLAY=:99
-                                   Xvfb :99 -screen 0 1024x768x24 &
-                                   sleep 3
+                        echo "Setting up headless environment..."
+                        export DISPLAY=:99
+                        Xvfb :99 -screen 0 1024x768x24 &
+                        sleep 3
 
-                                   echo "Running Maven Selenium tests..."
-                                   mvn test -Dtest=!com.example.devops.UITest.FoyerUITest -Dwebdriver.chrome.driver=\$CHROME_DRIVER_PATH -Dselenium.headless=true
-                               """
-                           }
-                 }
+                        echo "Running Maven Selenium tests..."
+                        // Run only Selenium UI tests
+                        mvn test -Dtest=com.example.devops.UITest.FoyerUITest -Dwebdriver.chrome.driver=\$CHROME_DRIVER_PATH -Dselenium.headless=true
+                    """
+                }
+            }
         }
 
         stage('JaCoCo Coverage Report') {
