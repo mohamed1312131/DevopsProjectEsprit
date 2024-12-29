@@ -22,22 +22,26 @@ pipeline {
            steps {
                // Exclude Selenium UI tests using Maven's exclude option
                script {
-                   echo "Debugging Environment Variables:"
-                   echo "CHROME_DRIVER_PATH: ${env.CHROME_DRIVER_PATH}"
-                   echo "PATH: ${env.PATH}"
-                   echo "DISPLAY: ${env.DISPLAY}"
-                   echo "Current User: $(whoami)"
+                          // Debugging Environment Variables with escaped dollar signs
+                             echo "Debugging Environment Variables:"
+                             echo "CHROME_DRIVER_PATH: \$CHROME_DRIVER_PATH"
+                             echo "PATH: \$PATH"
+                             echo "DISPLAY: \$DISPLAY"
+                             echo "Current User: \$(whoami)" // Escape the dollar signs for shell commands
 
-                   echo "Checking ChromeDriver version:"
-                   sh "chromedriver --version || { echo 'ChromeDriver not found or not executable!'; exit 1; }"
+                             // Checking ChromeDriver version
+                             echo "Checking ChromeDriver version:"
+                             sh "chromedriver --version || { echo 'ChromeDriver not found or not executable!'; exit 1; }"
 
-                   echo "Checking Google Chrome version:"
-                   sh "google-chrome --version || { echo 'Google Chrome not found or not executable!'; exit 1; }"
+                             // Checking Google Chrome version
+                             echo "Checking Google Chrome version:"
+                             sh "google-chrome --version || { echo 'Google Chrome not found or not executable!'; exit 1; }"
 
-                   echo "Setting up headless environment..."
-                   sh "export DISPLAY=:99"
-                   sh "Xvfb :99 -screen 0 1024x768x24 &"
-                   sh "sleep 3"
+                             // Setting up the headless environment
+                             echo "Setting up headless environment..."
+                             sh "export DISPLAY=:99"
+                             sh "Xvfb :99 -screen 0 1024x768x24 &"
+                             sh "sleep 3"
 
                    echo "Running Selenium Maven tests..."
                    // Run all tests excluding Selenium UI tests
