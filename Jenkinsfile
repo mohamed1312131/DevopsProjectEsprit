@@ -43,9 +43,13 @@ pipeline {
                              sh "Xvfb :99 -screen 0 1024x768x24 &"
                              sh "sleep 3"
 
-                   echo "Running Selenium Maven tests..."
+                   echo "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
                    // Run all tests excluding Selenium UI tests
-                   echo "mvn test"
+                   sh """
+                       mvn test -Dtest=com.example.devops.UITest.FoyerUITest \
+                                -Dwebdriver.chrome.driver=${env.CHROME_DRIVER_PATH} \
+                                -Dselenium.headless=true
+                   """
                }
                junit 'target/surefire-reports/*.xml'
            }
