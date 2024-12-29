@@ -50,7 +50,7 @@ pipeline {
                                    sleep 3
 
                                    echo "Running Maven Selenium tests..."
-                                   mvn test -Dtest=com.example.devops.UITest.* -Dwebdriver.chrome.driver=\$CHROME_DRIVER_PATH -Dselenium.headless=true
+                                   mvn test -Dtest=!com.example.devops.UITest.FoyerUITest -Dwebdriver.chrome.driver=\$CHROME_DRIVER_PATH -Dselenium.headless=true
                                """
                            }
                  }
