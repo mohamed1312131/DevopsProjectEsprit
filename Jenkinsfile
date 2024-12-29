@@ -7,6 +7,7 @@ pipeline {
         VERSION = "0.0.1-SNAPSHOT"
         NEXUS_URL = "http://192.168.50.4:8081/repository/maven-snapshots/"
         GRAFANA_URL = "http://192.168.50.4:3000/d/haryan-jenkins"
+        CHROME_DRIVER_PATH = "/usr/local/bin/chromedriver"
         DISPLAY = ":99"  // For running headless browsers if needed (X virtual framebuffer)
     }
 
