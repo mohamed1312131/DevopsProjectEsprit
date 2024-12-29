@@ -18,34 +18,38 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
-            steps {
-                // Exclude Selenium UI tests using Maven's exclude option
-                sh """
-                                        echo "Debugging Environment Variables:"
-                                        echo "CHROME_DRIVER_PATH: \$CHROME_DRIVER_PATH"
-                                        echo "PATH: \$PATH"
-                                        echo "DISPLAY: \$DISPLAY"
-                                        echo "Current User: \$(whoami)"
+       stage('Run Tests') {
+           steps {
+               // Exclude Selenium UI tests using Maven's exclude option
+               script {
+                   echo "Debugging Environment Variables:"
+                   echo "CHROME_DRIVER_PATH: ${env.CHROME_DRIVER_PATH}"
+                   echo "PATH: ${env.PATH}"
+                   echo "DISPLAY: ${env.DISPLAY}"
+                   echo "Current User: $(whoami)"
 
-                                        echo "Checking ChromeDriver version:"
-                                        chromedriver --version || { echo "ChromeDriver not found or not executable!"; exit 1; }
-                                        echo "Checking Google Chrome version:"
-                                        google-chrome --version || { echo "Google Chrome not found or not executable!"; exit 1; }
+                   echo "Checking ChromeDriver version:"
+                   sh "chromedriver --version || { echo 'ChromeDriver not found or not executable!'; exit 1; }"
 
-                                        echo "Setting up headless environment..."
-                                        export DISPLAY=:99
-                                        Xvfb :99 -screen 0 1024x768x24 &
-                                        sleep 3
+                   echo "Checking Google Chrome version:"
+                   sh "google-chrome --version || { echo 'Google Chrome not found or not executable!'; exit 1; }"
 
-                                        echo "Running Maven Selenium tests..."
-                                        mvn test -Dtest=com.example.devops.UITest.* -Dwebdriver.chrome.driver=\$CHROME_DRIVER_PATH -Dselenium.headless=true
-                                    """
-                sh 'mvn test -Dtest=!com.example.devops.UITest.*'
+                   echo "Setting up headless environment..."
+                   sh "export DISPLAY=:99"
+                   sh "Xvfb :99 -screen 0 1024x768x24 &"
+                   sh "sleep 3"
 
-                junit 'target/surefire-reports/*.xml'
-            }
-        }
+                   echo "Running Selenium Maven tests..."
+                   // Run all tests excluding Selenium UI tests
+                   sh """
+                       mvn test -Dtest=com.example.devops.UITest.FoyerUITest \
+                                -Dwebdriver.chrome.driver=${env.CHROME_DRIVER_PATH} \
+                                -Dselenium.headless=true
+                   """
+               }
+               junit 'target/surefire-reports/*.xml'
+           }
+       }
 
         stage('UI Tests - Selenium') {
             steps {
