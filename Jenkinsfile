@@ -29,21 +29,30 @@ pipeline {
 
         // UI Tests - Selenium Stage
         stage('UI Tests - Selenium') {
-            steps {
-                script {
-                    echo "Running Selenium UI tests..."
-                    sh """
-                        echo "Setting up headless environment..."
-                        export DISPLAY=:99
-                        Xvfb :99 -screen 0 1024x768x24 &
-                        sleep 3
+             steps {
+                           script {
+                               echo "Running Selenium UI tests..."
+                               sh """
+                                   echo "Debugging Environment Variables:"
+                                   echo "CHROME_DRIVER_PATH: \$CHROME_DRIVER_PATH"
+                                   echo "PATH: \$PATH"
+                                   echo "DISPLAY: \$DISPLAY"
+                                   echo "Current User: \$(whoami)"
 
-                        echo "Running Maven Selenium tests..."
-                        mvn test -Dtest=com.example.devops.UITest.* -Dwebdriver.chrome.driver=\$CHROME_DRIVER_PATH -Dselenium.headless=true
-                    """
-                }
-                junit 'target/surefire-reports/*.xml'  // Collect test results for Selenium tests
-            }
+                                   echo "Checking ChromeDriver version:"
+                                   chromedriver --version || { echo "ChromeDriver not found or not executable!"; exit 1; }
+                                   echo "Checking Google Chrome version:"
+                                   google-chrome --version || { echo "Google Chrome not found or not executable!"; exit 1; }
+
+                                   echo "Setting up headless environment..."
+                                   export DISPLAY=:99
+                                   Xvfb :99 -screen 0 1024x768x24 &
+                                   sleep 3
+
+                                   echo "Running Maven Selenium tests..."
+                                   mvn test -Dtest=com.example.devops.UITest.* -Dwebdriver.chrome.driver=\$CHROME_DRIVER_PATH -Dselenium.headless=true
+                               """
+                           }
         }
 
         stage('JaCoCo Coverage Report') {
