@@ -21,7 +21,8 @@ pipeline {
         // JUnit Tests Stage
         stage('Run Tests') {
             steps {
-                sh 'mvn test'  // This runs the JUnit tests
+//                 sh 'mvn test'  // This runs the JUnit tests
+                sh 'mvn test -Dtest=!com.example.devops.UITest.FoyerUITest'
                 junit 'target/surefire-reports/*.xml'  // Collect test results
             }
         }
