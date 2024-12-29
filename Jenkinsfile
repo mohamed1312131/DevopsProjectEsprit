@@ -31,10 +31,10 @@ pipeline {
                  echo "Running Selenium UI tests..."
                  sh """
                      echo "Debugging Environment Variables:"
-                     echo "CHROME_DRIVER_PATH: $CHROME_DRIVER_PATH"
-                     echo "PATH: $PATH"
-                     echo "DISPLAY: $DISPLAY"
-                     echo "Current User: $(whoami)"
+                     echo "CHROME_DRIVER_PATH: \$CHROME_DRIVER_PATH"
+                     echo "PATH: \$PATH"
+                     echo "DISPLAY: \$DISPLAY"
+                     echo "Current User: \$(whoami)"
 
                      echo "Checking ChromeDriver version:"
                      chromedriver --version || { echo "ChromeDriver not found or not executable!"; exit 1; }
@@ -47,7 +47,7 @@ pipeline {
                      sleep 3
 
                      echo "Running Maven Selenium tests..."
-                     mvn test -Dtest=com.example.devops.UITest.FoyerUITest -Dwebdriver.chrome.driver=$CHROME_DRIVER_PATH -Dselenium.headless=true
+                     mvn test -Dtest=com.example.devops.UITest.FoyerUITest -Dwebdriver.chrome.driver=\$CHROME_DRIVER_PATH -Dselenium.headless=true
                  """
              }
              junit 'target/surefire-reports/*.xml'
