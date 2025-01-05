@@ -5,7 +5,7 @@ pipeline {
         VM_IP = '192.168.33.10'
     }
     stages {
-        stage('Build') {
+       /* stage('Build') {
             steps {
                 sh 'mvn clean compile'
             }
@@ -46,7 +46,7 @@ pipeline {
                     docker build -t devops-app:latest .
                 '''
             }
-        }
+        } */
         stage('Deploy with Docker Compose') {
             steps {
                 sh '''
