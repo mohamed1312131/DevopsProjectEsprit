@@ -47,14 +47,19 @@ pipeline {
                 '''
             }
         } */
-        stage('Deploy with Docker Compose') {
-            steps {
-                sh '''
-                    docker compose down || true
-                    docker compose up -d
-                '''
-            }
-        }
+        stage('Deploy Containers') {
+                    steps {
+                        script {
+                            sh '''
+                                cd deployment
+                                export APP_PORT=${APP_PORT}
+                                docker compose down --remove-orphans
+                                docker compose up -d
+                                docker compose ps
+                            '''
+                        }
+                    }
+                }
     }
     post {
         always {
