@@ -1,6 +1,13 @@
 pipeline {
     agent any
 
+    environment {
+        ARTIFACT_ID = "devops"
+        GROUP_ID = "com.example"
+        VERSION = "0.0.1-SNAPSHOT"
+        NEXUS_URL = "http://192.168.50.4:8081/repository/maven-snapshots/"
+
+    }
     stages {
         stage('Build') {
             steps {
@@ -30,6 +37,18 @@ pipeline {
                 }
             }
         }
+        stage('Deploy to Nexus') {
+                    steps {
+                        withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+                            sh '''
+                            mvn deploy -DaltDeploymentRepository=nexus::default::${NEXUS_URL} \
+                                        -Dusername=${NEXUS_USERNAME} \
+                                        -Dpassword=${NEXUS_PASSWORD}
+                            '''
+                        }
+                    }
+                }
+
     }
 
     post {
