@@ -5,7 +5,7 @@ services:
     image: devops-app:latest
     container_name: devops-app
     ports:
-      - "8080:8080"
+      - "8081:8081"
     environment:
       - SPRING_APPLICATION_NAME=devops
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/devops?createDatabaseIfNotExist=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
