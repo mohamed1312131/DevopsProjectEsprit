@@ -1,62 +1,35 @@
 pipeline {
     agent any
     stages {
-        stage('Build') {
-            steps {
-                sh 'mvn clean compile'
-            }
-        }
 
-        stage('Run Tests') {
-            steps {
+                 stage('Deploy with Docker Compose') {
+                             steps {
+                                 script {
+                                     // Stop any existing containers
+                                     sh '''
+                                         if docker compose ps | grep -q "devops-app"; then
+                                             docker compose down
+                                         fi
+                                     '''
 
-                sh 'mvn test'
+                                     // Start the application with Docker Compose using the file from Git
+                                     sh 'docker compose up -d'
 
-                junit 'target/surefire-reports/*.xml'
-
-            }
-        }
-        stage('JaCoCo Coverage Report') {
-                    steps {
-                        sh 'mvn verify'
-                    }
-                }
-
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh 'mvn sonar:sonar'
-                }
-            }
-        }
-        stage("mvn build") {
-                    steps {
-                        script {
-                            sh "mvn package -DskipTests"
-                        }
-                    }
-        }
-               stage('Deploy to Nexus') {
-                    steps {
-                        script {
-                            sh "mvn clean deploy -DskipTests"
-                        }
-                    }
-                }
-                 stage('Build Docker Image') {
-                            steps {
-                                script {
-                                    sh '''
-                                         curl -u admin:hesoyam -O \
-                                                        http://192.168.33.10:8081/repository/maven-snapshots/com/example/devops/0.0.1-SNAPSHOT/devops-0.0.1-20250105.142846-3.jar
-                                                        DOCKER_BUILDKIT=1 docker build -t devops-app:latest .
-                                    '''
-
-                                    // Build Docker image
-                                    sh 'docker build -t devops-app:latest .'
-                                }
-                            }
-                        }
+                                     // Wait for application to be ready
+                                     sh '''
+                                         echo "Waiting for application to start..."
+                                         sleep 30
+                                         if curl -s http://localhost:8080 > /dev/null; then
+                                             echo "Application is up and running!"
+                                         else
+                                             echo "Application failed to start!"
+                                             docker compose logs app
+                                             exit 1
+                                         fi
+                                     '''
+                                 }
+                             }
+                         }
     }
 
     post {
