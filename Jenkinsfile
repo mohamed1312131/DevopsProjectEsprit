@@ -53,7 +53,7 @@ pipeline {
                                     '''
 
                                     // Build Docker image
-                                    sh 'sudo docker build -t devops-app:latest .'
+                                    sh 'docker build -t devops-app:latest .'
                                 }
                             }
                         }
