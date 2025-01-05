@@ -1,69 +1,67 @@
 pipeline {
     agent any
     environment {
-            APP_PORT = '8080'
-        }
-    stages {
-
-                 stage('Cleanup Previous Deployment') {
-                             steps {
-                                 script {
-                                     sh '''
-                                         # Stop any existing docker compose services
-                                         if docker compose ps | grep -q "devops-app"; then
-                                             docker compose down
-                                         fi
-
-                                         # Find and kill any process using port 8080
-                                         PORT_PID=$(lsof -ti:8080)
-                                         if [ ! -z "$PORT_PID" ]; then
-                                             echo "Killing process using port 8080: $PORT_PID"
-                                             kill -9 $PORT_PID || true
-                                         fi
-
-                                         # Remove any stopped containers
-                                         docker container prune -f
-                                     '''
-                                 }
-                             }
-                         }
-                         stage('Deploy with Docker Compose') {
-                             steps {
-                                 script {
-                                     // Start the application with Docker Compose
-                                     sh '''
-                                         # Export port as environment variable
-                                         export APP_PORT=${APP_PORT}
-
-                                         # Start containers
-                                         docker compose up -d
-
-                                         # Wait for application to start
-                                         echo "Waiting for application to start..."
-                                         for i in {1..30}; do
-                                             if curl -s http://localhost:${APP_PORT} > /dev/null; then
-                                                 echo "Application is up and running!"
-                                                 exit 0
-                                             fi
-                                             sleep 2
-                                             echo "Attempt $i: Application not ready yet..."
-                                         done
-
-                                         echo "Application failed to start!"
-                                         docker compose logs app
-                                         exit 1
-                                     '''
-                                 }
-                             }
-                         }
+        APP_PORT = '8089'
+        VM_IP = '192.168.33.10'
     }
-
+    stages {
+        stage('Build') {
+            steps {
+                sh 'mvn clean compile'
+            }
+        }
+        stage('Run Tests') {
+            steps {
+                sh 'mvn test'
+                junit 'target/surefire-reports/*.xml'
+            }
+        }
+        stage('JaCoCo Coverage Report') {
+            steps {
+                sh 'mvn verify'
+            }
+        }
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh 'mvn sonar:sonar'
+                }
+            }
+        }
+        stage('Maven Build') {
+            steps {
+                sh 'mvn package -DskipTests'
+            }
+        }
+        stage('Deploy to Nexus') {
+            steps {
+                sh 'mvn deploy -DskipTests'
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                sh '''
+                    curl -u admin:hesoyam -O \
+                    http://${VM_IP}:8081/repository/maven-snapshots/com/example/devops/0.0.1-SNAPSHOT/devops-0.0.1-20250105.142846-3.jar
+                    docker build -t devops-app:latest .
+                '''
+            }
+        }
+        stage('Deploy with Docker Compose') {
+            steps {
+                sh '''
+                    docker compose down || true
+                    docker compose up -d
+                '''
+            }
+        }
+    }
     post {
         always {
             echo "Building branch: ${env.BRANCH_NAME}"
         }
         success {
-            echo 'Build succeeded!'
+            echo "Application deployed successfully at http://${VM_IP}:${APP_PORT}"
         }
         failure {
             echo 'Build failed!'
