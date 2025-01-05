@@ -19,7 +19,7 @@ pipeline {
                                      sh '''
                                          echo "Waiting for application to start..."
                                          sleep 30
-                                         if curl -s http://localhost:8080 > /dev/null; then
+                                         if curl -s http://localhost:8081 > /dev/null; then
                                              echo "Application is up and running!"
                                          else
                                              echo "Application failed to start!"
