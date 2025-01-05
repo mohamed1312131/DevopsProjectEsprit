@@ -51,6 +51,13 @@ pipeline {
         stage('Start Prometheus and Grafana') {
             steps {
                 echo "Starting Prometheus and Grafana containers..."
+
+                // Stop and remove existing containers (if any)
+                sh '''
+                docker stop prometheus grafana || true
+                docker rm prometheus grafana || true
+                '''
+
                 // Start Prometheus
                 sh '''
                 docker run -d --name prometheus \
@@ -64,15 +71,6 @@ pipeline {
                 docker run -d --name grafana \
                 -p 3000:3000 \
                 grafana/grafana
-                '''
-            }
-        }
-
-        stage('Verify Monitoring Services') {
-            steps {
-                sh '''
-                docker ps | grep prometheus
-                docker ps | grep grafana
                 '''
             }
         }
