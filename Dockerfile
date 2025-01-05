@@ -1,3 +1,5 @@
+FROM openjdk:17-jdk-slim
+
 WORKDIR /app
 
 # Add a non-root user
@@ -11,7 +13,6 @@ RUN chown -R javauser:javauser /app
 # Switch to non-root user
 USER javauser
 
-# Change to match the port in docker-compose
-EXPOSE 8089
+EXPOSE 8080
 
 CMD ["java", "-jar", "app.jar"]

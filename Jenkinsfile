@@ -5,7 +5,7 @@ pipeline {
         VM_IP = '192.168.33.10'
     }
     stages {
-        /*stage('Build') {
+       stage('Build') {
             steps {
                 sh 'mvn clean compile'
             }
@@ -28,44 +28,23 @@ pipeline {
                 }
             }
         }
-        stage("mvn build") {
+        stage('Maven Build') {
             steps {
-                script {
-                    sh "mvn package -DskipTests"
-                }
+                sh 'mvn package -DskipTests'
             }
         }
         stage('Deploy to Nexus') {
             steps {
-                script {
-                    sh "mvn clean deploy -DskipTests"
-                }
+                sh 'mvn deploy -DskipTests'
             }
         }
         stage('Build Docker Image') {
             steps {
-                script {
-                    sh '''
-                        mkdir -p deployment
-                        cd deployment
-                        curl -u admin:hesoyam -O \
-                        http://${VM_IP}:8081/repository/maven-snapshots/com/example/devops/0.0.1-SNAPSHOT/devops-0.0.1-20250105.142846-3.jar
-                        docker build -t devops-app:latest .
-                    '''
-                }
-            }
-        } */
-        stage('Deploy Containers') {
-            steps {
-                script {
-                    sh '''
-                        cd deployment
-                        export APP_PORT=${APP_PORT}
-                        docker compose down --remove-orphans
-                        docker compose up -d
-                        docker compose ps
-                    '''
-                }
+                sh '''
+                    curl -u admin:hesoyam -O \
+                    http://${VM_IP}:8081/repository/maven-snapshots/com/example/devops/0.0.1-SNAPSHOT/devops-0.0.1-20250105.142846-3.jar
+                    docker build -t devops-app:latest .
+                '''
             }
         }
     }
@@ -74,19 +53,10 @@ pipeline {
             echo "Building branch: ${env.BRANCH_NAME}"
         }
         success {
-            echo "Application deployed successfully at http://${env.VM_IP}:${env.APP_PORT}"
+            echo "Application deployed successfully at http://${VM_IP}:${APP_PORT}"
         }
         failure {
             echo 'Build failed!'
-            script {
-                sh '''
-                    cd deployment
-                    if docker compose ps | grep -q "devops-app"; then
-                        docker compose logs app
-                        docker compose down
-                    fi
-                '''
-            }
         }
     }
 }
