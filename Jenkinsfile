@@ -52,26 +52,27 @@ pipeline {
             steps {
                 echo "Starting Prometheus and Grafana containers..."
 
-                // Stop and remove existing containers (if any)
+                // Stop and remove any existing containers (ignores errors if they don't exist)
                 sh '''
                 docker stop prometheus grafana || true
                 docker rm prometheus grafana || true
                 '''
 
-                // Start Prometheus
-                sh '''
-                docker run -d --name prometheus \
-                -p 9090:9090 \
-                -v /path/to/prometheus.yml:/etc/prometheus/prometheus.yml \
-                prom/prometheus
-                '''
+                // Ensure Prometheus config file exists before running
+                if [ -f "/path/to/prometheus.yml" ]; then
+                    docker run -d --name prometheus \
+                    -p 9090:9090 \
+                    -v /path/to/prometheus.yml:/etc/prometheus/prometheus.yml \
+                    prom/prometheus
+                else
+                    echo "Error: prometheus.yml not found!"
+                    exit 1
+                fi
 
-                // Start Grafana
-                sh '''
+                // Start Grafana without volume mounting issues
                 docker run -d --name grafana \
                 -p 3000:3000 \
                 grafana/grafana
-                '''
             }
         }
 
