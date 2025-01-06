@@ -49,10 +49,10 @@ pipeline {
             }
 
             stage('Prometheus Metrics Collection') {
-                        steps {
-                            sh 'curl -X POST http://<PROMETHEUS_SERVER>:9090/api/v1/admin/tsdb/snapshot'
-                        }
-                    }
+                steps {
+                    sh 'curl -X POST ${PROMETHEUS_SERVER:-http://localhost:9090}/api/v1/admin/tsdb/snapshot'
+                }
+            }
 
                     stage('Notify Grafana') {
                         steps {
