@@ -57,12 +57,13 @@ pipeline {
                     stage('Notify Grafana') {
                         steps {
                             sh '''
-                            curl -X POST \
+                            curl -X POST ${GRAFANA_SERVER:-http://localhost:3000}/api/annotations \
                             -H "Content-Type: application/json" \
-                            -d '{"title": "Jenkins Pipeline Completed", "message": "The pipeline execution has finished successfully."}' \
-                            http://<GRAFANA_SERVER>:3000/api/annotations
+                            -d '{
+                                "text": "Build Completed",
+                                "tags": ["jenkins", "build"]
+                            }'
                             '''
                         }
-                    }
                 }
     }
