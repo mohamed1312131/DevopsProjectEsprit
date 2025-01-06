@@ -110,33 +110,33 @@ pipeline {
                 }
             }
         }
-        stage('Deploy with Docker Compose') {
-            steps {
-                echo 'Starting Docker Compose Deployment...'
-                script {
-                    echo 'Stopping existing containers (if any)...'
-                    sh '''
-                        docker compose down || echo "No containers to stop"
-                    '''
-
-                    echo 'Starting containers...'
-                    sh '''
-                        docker compose up -d
-                    '''
-
-                    echo 'Waiting for services to initialize...'
-                    sh '''
-                        sleep 30
-                    '''
-
-                    echo 'Verifying deployment status...'
-                    sh '''
-                        docker compose ps
-                    '''
-                }
-                echo 'Docker Compose Deployment stage completed successfully.'
-            }
-        }
+//         stage('Deploy with Docker Compose') {
+//             steps {
+//                 echo 'Starting Docker Compose Deployment...'
+//                 script {
+//                     echo 'Stopping existing containers (if any)...'
+//                     sh '''
+//                         docker compose down || echo "No containers to stop"
+//                     '''
+//
+//                     echo 'Starting containers...'
+//                     sh '''
+//                         docker compose up -d
+//                     '''
+//
+//                     echo 'Waiting for services to initialize...'
+//                     sh '''
+//                         sleep 30
+//                     '''
+//
+//                     echo 'Verifying deployment status...'
+//                     sh '''
+//                         docker compose ps
+//                     '''
+//                 }
+//                 echo 'Docker Compose Deployment stage completed successfully.'
+//             }
+//         }
 
     }
 
