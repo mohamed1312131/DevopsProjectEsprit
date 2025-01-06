@@ -9,60 +9,56 @@ pipeline {
     }
 
     stages {
-        stage('Build') {
-            steps {
-                sh 'mvn clean compile'
-            }
-        }
-
-        stage('Run Tests') {
-            steps {
-                sh 'mvn test'
-                junit 'target/surefire-reports/*.xml'
-            }
-        }
-
-        stage('JaCoCo Coverage Report') {
-            steps {
-                sh 'mvn verify'
-            }
-        }
-
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh 'mvn sonar:sonar'
+            stage('Build') {
+                steps {
+                    sh 'mvn clean compile'
                 }
             }
-        }
 
-        stage('Deploy to Nexus') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-                    sh '''
-                    mvn deploy -DaltDeploymentRepository=nexus::default::${NEXUS_URL} \
-                                -Dusername=${NEXUS_USERNAME} \
-                                -Dpassword=${NEXUS_PASSWORD}
-                    '''
+            stage('Run Tests') {
+                steps {
+                    sh 'mvn test'
+                    junit 'target/surefire-reports/*.xml'
                 }
             }
-        }
 
-        stage('Prometheus Metrics Collection') {
-            steps {
-                sh '''
-                curl -X POST ${PROMETHEUS_SERVER:-http://localhost:9090/api/v1/admin/tsdb/snapshot
-                '''
+            stage('JaCoCo Coverage Report') {
+                steps {
+                    sh 'mvn verify'
+                }
             }
-        }
 
-        stage('Notify Grafana') {
-            steps {
-                withCredentials([string(credentialsId: 'grafana-api-token', variable: 'GRAFANA_API_KEY')]) {
+            stage('SonarQube Analysis') {
+                steps {
+                    withSonarQubeEnv('SonarQube') {
+                        sh 'mvn sonar:sonar'
+                    }
+                }
+            }
+
+            stage('Deploy to Nexus') {
+                steps {
+                    withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+                        sh '''
+                        mvn deploy -DaltDeploymentRepository=nexus::default::${NEXUS_URL} \
+                                    -Dusername=${NEXUS_USERNAME} \
+                                    -Dpassword=${NEXUS_PASSWORD}
+                        '''
+                    }
+                }
+            }
+
+            stage('Prometheus Metrics Collection') {
+                steps {
+                    sh 'curl -X POST ${PROMETHEUS_SERVER:-http://localhost:9090}/api/v1/admin/tsdb/snapshot'
+                }
+            }
+
+            stage('Notify Grafana') {
+                steps {
                     sh '''
                     curl -X POST ${GRAFANA_SERVER:-http://localhost:3000}/api/annotations \
                     -H "Content-Type: application/json" \
-                    -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
                     -d '{
                         "text": "Build Completed",
                         "tags": ["jenkins", "build"]
@@ -70,6 +66,5 @@ pipeline {
                     '''
                 }
             }
-        }
     }
 }
