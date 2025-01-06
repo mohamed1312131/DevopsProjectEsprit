@@ -54,16 +54,16 @@ pipeline {
                 }
             }
 
-                    stage('Notify Grafana') {
-                        steps {
-                            sh '''
-                            curl -X POST ${GRAFANA_SERVER:-http://localhost:3000}/api/annotations \
-                            -H "Content-Type: application/json" \
-                            -d '{
-                                "text": "Build Completed",
-                                "tags": ["jenkins", "build"]
-                            }'
-                            '''
-                        }
+            stage('Notify Grafana') {
+                steps {
+                    sh '''
+                    curl -X POST ${GRAFANA_SERVER:-http://localhost:3000}/api/annotations \
+                    -H "Content-Type: application/json" \
+                    -d '{
+                        "text": "Build Completed",
+                        "tags": ["jenkins", "build"]
+                    }'
+                    '''
                 }
+            }
     }
