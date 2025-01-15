@@ -2,6 +2,11 @@ pipeline {
     agent any
 
     stages {
+    stage('Clean Workspace') {
+        steps {
+            cleanWs() // Clears the workspace before proceeding
+        }
+    }
         stage('Download Artifact') {
             steps {
                 script {
