@@ -35,19 +35,19 @@ pipeline {
         stage('Deploy Application') {
             steps {
                 script {
-                    // Create .env file for docker-compose
+                    // Create .env file for docker compose
                     sh """
                         echo "APP_PORT=${APP_PORT}" > .env
                     """
 
                     // Stop existing containers if running
                     sh """
-                        docker-compose -f ${COMPOSE_FILE} -p ${PROJECT_NAME} down || true
+                        docker compose -f ${COMPOSE_FILE} -p ${PROJECT_NAME} down || true
                     """
 
                     // Start the application
                     sh """
-                        docker-compose -f ${COMPOSE_FILE} -p ${PROJECT_NAME} up -d
+                        docker compose -f ${COMPOSE_FILE} -p ${PROJECT_NAME} up -d
                     """
                 }
             }
@@ -77,7 +77,7 @@ pipeline {
             script {
                 // Cleanup on failure
                 sh """
-                    docker-compose -f ${COMPOSE_FILE} -p ${PROJECT_NAME} down || true
+                    docker compose -f ${COMPOSE_FILE} -p ${PROJECT_NAME} down || true
                 """
                 error "Deployment failed! Cleaned up resources."
             }
