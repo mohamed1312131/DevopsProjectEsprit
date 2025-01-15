@@ -1,39 +1,56 @@
 pipeline {
     agent any
-    environment {
-        APP_PORT = '8089'
-        VM_IP = '192.168.33.10'
-    }
     stages {
         stage('Build') {
             steps {
-                echo 'Building the application...'
                 sh 'mvn clean compile'
             }
         }
-        stage('Maven Package') {
+
+        stage('Run Tests') {
             steps {
-                echo 'Packaging the application...'
-                sh 'mvn package -DskipTests'
+
+                sh 'mvn test'
+
+                junit 'target/surefire-reports/*.xml'
+
             }
         }
-        stage('Build Docker Image') {
+        stage('JaCoCo Coverage Report') {
+                    steps {
+                        sh 'mvn verify'
+                    }
+                }
+
+        stage('SonarQube Analysis') {
             steps {
-                echo 'Creating Docker image...'
-                sh '''
-                    curl -u admin:hesoyam -O \
-                    http://${VM_IP}:8081/repository/maven-snapshots/com/example/devops/0.0.1-SNAPSHOT/devops-0.0.1-20250105.142846-3.jar
-                    docker build -t devops-app:latest .
-                '''
+                withSonarQubeEnv('SonarQube') {
+                    sh 'mvn sonar:sonar'
+                }
             }
         }
+        stage("mvn build") {
+                    steps {
+                        script {
+                            sh "mvn package -DskipTests"
+                        }
+                    }
+        }
+               stage('Deploy to Nexus') {
+                    steps {
+                        script {
+                            sh "mvn clean deploy -DskipTests"
+                        }
+                    }
+                }
     }
+
     post {
         always {
             echo "Building branch: ${env.BRANCH_NAME}"
         }
         success {
-            echo "Docker image created successfully: devops-app:latest"
+            echo 'Build succeeded!'
         }
         failure {
             echo 'Build failed!'
