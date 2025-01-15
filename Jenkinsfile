@@ -8,19 +8,40 @@ pipeline {
         APP_PORT = '8089'
         COMPOSE_FILE = 'docker-compose.yml'
         PROJECT_NAME = 'devops'
+        // Use Jenkins BUILD_NUMBER to create unique container names
+        MYSQL_CONTAINER = "mysql-db-${BUILD_NUMBER}"
+        APP_CONTAINER = "devops-app-${BUILD_NUMBER}"
     }
 
     stages {
+        stage('Cleanup Previous Deployment') {
+            steps {
+                script {
+                    // Stop and remove any existing containers
+                    sh '''
+                        # Stop any existing deployment
+                        docker compose -f ${COMPOSE_FILE} -p ${PROJECT_NAME} down || true
+
+                        # Remove any leftover containers
+                        docker rm -f mysql-db devops-app || true
+
+                        # Remove any existing networks
+                        docker network rm devops_devops-network || true
+
+                        # Clean up any dangling volumes
+                        docker volume prune -f
+                    '''
+                }
+            }
+        }
+
         stage('Create Docker Compose File') {
             steps {
                 script {
-                    // Create docker-compose.yml
-                    writeFile file: 'docker-compose.yml', text: '''version: '3.8'
-
-services:
+                    writeFile file: 'docker-compose.yml', text: '''services:
   app:
     image: devops-app:latest
-    container_name: devops-app
+    container_name: ${APP_CONTAINER}
     ports:
       - "${APP_PORT}:8089"
     environment:
@@ -39,7 +60,7 @@ services:
 
   mysql:
     image: mysql:8.0
-    container_name: mysql-db
+    container_name: ${MYSQL_CONTAINER}
     ports:
       - "3306:3306"
     environment:
@@ -89,17 +110,11 @@ volumes:
         stage('Deploy Application') {
             steps {
                 script {
-                    // Create .env file for docker compose
+                    // Create .env file with dynamic container names
                     sh """
                         echo "APP_PORT=${APP_PORT}" > .env
-                    """
-
-                    // Display the contents of the workspace for debugging
-                    sh 'pwd && ls -la'
-
-                    // Stop existing containers if running
-                    sh """
-                        docker compose -f ${COMPOSE_FILE} -p ${PROJECT_NAME} down || true
+                        echo "MYSQL_CONTAINER=${MYSQL_CONTAINER}" >> .env
+                        echo "APP_CONTAINER=${APP_CONTAINER}" >> .env
                     """
 
                     // Start the application
@@ -113,10 +128,9 @@ volumes:
         stage('Health Check') {
             steps {
                 script {
-                    // Wait for the application to be ready
                     sh """
                         # Wait for MySQL to be ready
-                        timeout 300 bash -c 'until docker exec mysql-db mysqladmin ping -h localhost --silent; do sleep 5; done'
+                        timeout 300 bash -c 'until docker exec ${MYSQL_CONTAINER} mysqladmin ping -h localhost --silent; do sleep 5; done'
 
                         # Wait for the application to be ready
                         timeout 300 bash -c 'until curl -s http://localhost:${APP_PORT}/actuator/health > /dev/null; do sleep 5; done'
@@ -132,15 +146,14 @@ volumes:
         }
         failure {
             script {
-                // Cleanup on failure
                 sh """
                     docker compose -f ${COMPOSE_FILE} -p ${PROJECT_NAME} down || true
+                    docker rm -f ${MYSQL_CONTAINER} ${APP_CONTAINER} || true
                 """
                 error "Deployment failed! Cleaned up resources."
             }
         }
         always {
-            // Clean up unused images
             sh """
                 docker image prune -f
             """
