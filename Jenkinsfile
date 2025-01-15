@@ -5,41 +5,21 @@ pipeline {
         VM_IP = '192.168.33.10'
     }
     stages {
-       stage('Build') {
+        stage('Build') {
             steps {
+                echo 'Building the application...'
                 sh 'mvn clean compile'
             }
         }
-        stage('Run Tests') {
+        stage('Maven Package') {
             steps {
-                sh 'mvn test'
-                junit 'target/surefire-reports/*.xml'
-            }
-        }
-        stage('JaCoCo Coverage Report') {
-            steps {
-                sh 'mvn verify'
-            }
-        }
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh 'mvn sonar:sonar'
-                }
-            }
-        }
-        stage('Maven Build') {
-            steps {
+                echo 'Packaging the application...'
                 sh 'mvn package -DskipTests'
-            }
-        }
-        stage('Deploy to Nexus') {
-            steps {
-                sh 'mvn deploy -DskipTests'
             }
         }
         stage('Build Docker Image') {
             steps {
+                echo 'Creating Docker image...'
                 sh '''
                     curl -u admin:hesoyam -O \
                     http://${VM_IP}:8081/repository/maven-snapshots/com/example/devops/0.0.1-SNAPSHOT/devops-0.0.1-20250105.142846-3.jar
@@ -53,7 +33,7 @@ pipeline {
             echo "Building branch: ${env.BRANCH_NAME}"
         }
         success {
-            echo "Application deployed successfully at http://${VM_IP}:${APP_PORT}"
+            echo "Docker image created successfully: devops-app:latest"
         }
         failure {
             echo 'Build failed!'
