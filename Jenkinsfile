@@ -14,20 +14,18 @@ pipeline {
                 }
             }
         }
-
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    // Debug: Verify the artifact exists before building the Docker image
-                    sh 'ls -l devops-0.0.1-20250105.142846-3.jar'
-
-                    // Build the Docker image
-                    sh '''
-                        DOCKER_BUILDKIT=1 docker build -t devops-app:latest .
-                    '''
+        stage('Docker Build') {
+                    steps {
+                        script {
+                            echo "Building Docker image..."
+                            sh """
+                                docker build -t devops:0.0.1-SNAPSHOT
+                            """
+                        }
+                    }
                 }
-            }
-        }
+
+
     }
 
     post {
