@@ -13,6 +13,6 @@ RUN chown -R javauser:javauser /app
 # Switch to non-root user
 USER javauser
 
-EXPOSE 8080
+EXPOSE 8089
 
 CMD ["java", "-jar", "app.jar"]
