@@ -11,6 +11,60 @@ pipeline {
     }
 
     stages {
+        stage('Create Docker Compose File') {
+            steps {
+                script {
+                    // Create docker-compose.yml
+                    writeFile file: 'docker-compose.yml', text: '''version: '3.8'
+
+services:
+  app:
+    image: devops-app:latest
+    container_name: devops-app
+    ports:
+      - "${APP_PORT}:8089"
+    environment:
+      - SPRING_APPLICATION_NAME=devops
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/devops?createDatabaseIfNotExist=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=
+      - SPRING_JPA_SHOW_SQL=true
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SERVER_ADDRESS=0.0.0.0
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - devops-network
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-db
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_DATABASE=devops
+    volumes:
+      - mysql-data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+    networks:
+      - devops-network
+
+networks:
+  devops-network:
+    driver: bridge
+
+volumes:
+  mysql-data:'''
+                }
+            }
+        }
+
         stage('Pull Images') {
             steps {
                 script {
@@ -39,6 +93,9 @@ pipeline {
                     sh """
                         echo "APP_PORT=${APP_PORT}" > .env
                     """
+
+                    // Display the contents of the workspace for debugging
+                    sh 'pwd && ls -la'
 
                     // Stop existing containers if running
                     sh """
