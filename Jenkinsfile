@@ -2,17 +2,18 @@ pipeline {
     agent any
 
     stages {
-    stage{
-        steps {
+        stage('Download Artifact') {
+            steps {
                 script {
+                    // Download the artifact from Nexus
                     sh '''
                         curl -u admin:hesoyam -O \
                         http://192.168.33.10:8081/repository/maven-snapshots/com/example/devops/0.0.1-SNAPSHOT/devops-0.0.1-20250105.142846-3.jar
-                        DOCKER_BUILDKIT=1 docker build -t devops-app:latest .
                     '''
                 }
             }
-    }
+        }
+
         stage('Build Docker Image') {
             steps {
                 script {
@@ -20,7 +21,9 @@ pipeline {
                     sh 'ls -l devops-0.0.1-20250105.142846-3.jar'
 
                     // Build the Docker image
-                    sh 'docker build -t devops-app:latest .'
+                    sh '''
+                        DOCKER_BUILDKIT=1 docker build -t devops-app:latest .
+                    '''
                 }
             }
         }
