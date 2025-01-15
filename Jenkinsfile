@@ -8,27 +8,19 @@ pipeline {
         APP_PORT = '8089'
         COMPOSE_FILE = 'docker-compose.yml'
         PROJECT_NAME = 'devops'
-        // Use Jenkins BUILD_NUMBER to create unique container names
         MYSQL_CONTAINER = "mysql-db-${BUILD_NUMBER}"
         APP_CONTAINER = "devops-app-${BUILD_NUMBER}"
+        APP_URL = "http://192.168.33.10:8089"
     }
 
     stages {
         stage('Cleanup Previous Deployment') {
             steps {
                 script {
-                    // Stop and remove any existing containers
                     sh '''
-                        # Stop any existing deployment
                         docker compose -f ${COMPOSE_FILE} -p ${PROJECT_NAME} down || true
-
-                        # Remove any leftover containers
                         docker rm -f mysql-db devops-app || true
-
-                        # Remove any existing networks
                         docker network rm devops_devops-network || true
-
-                        # Clean up any dangling volumes
                         docker volume prune -f
                     '''
                 }
@@ -110,40 +102,62 @@ volumes:
         stage('Deploy Application') {
             steps {
                 script {
-                    // Create .env file with dynamic container names
                     sh """
                         echo "APP_PORT=${APP_PORT}" > .env
-                        echo "MYSQL_CONTAINER=${MYSQL_CONTAINER}" >> .env
-                        echo "APP_CONTAINER=${APP_CONTAINER}" >> .env
-                    """
-
-                    // Start the application
-                    sh """
                         docker compose -f ${COMPOSE_FILE} -p ${PROJECT_NAME} up -d
                     """
                 }
             }
         }
 
+        stage('Verify Web Access') {
+            steps {
+                script {
+                    sh """
+                        # Wait for MySQL and application to be ready
+                        echo "Waiting for MySQL to be ready..."
+                        timeout 300 bash -c 'until docker exec ${MYSQL_CONTAINER} mysqladmin ping -h localhost --silent; do sleep 5; done'
+
+                        echo "Waiting for application to be accessible..."
+                        timeout 300 bash -c 'until curl -s ${APP_URL} > /dev/null; do sleep 5; echo "Waiting for application to respond..."; done'
+
+                        echo "Application is now accessible at ${APP_URL}"
+                        echo "You can now access the following endpoints:"
+                        echo "- Main URL: ${APP_URL}"
+                        echo "- Bloc API: ${APP_URL}/bloc/findAll"
+
+                        # Get response from main URL
+                        echo "Testing main URL response:"
+                        curl -v ${APP_URL}
+                    """
+                }
+            }
+        }
     }
 
     post {
         success {
-            echo "Deployment successful! Application is running on port ${APP_PORT}"
+            echo """
+                Deployment successful!
+
+                Your application is now running!
+                Access it at: ${APP_URL}
+                Test the API at: ${APP_URL}/bloc/findAll
+
+                You can now open these URLs in your web browser.
+            """
         }
         failure {
             script {
+                echo "Deployment failed! Cleaning up..."
                 sh """
                     docker compose -f ${COMPOSE_FILE} -p ${PROJECT_NAME} down || true
                     docker rm -f ${MYSQL_CONTAINER} ${APP_CONTAINER} || true
                 """
-                error "Deployment failed! Cleaned up resources."
             }
         }
         always {
-            sh """
-                docker image prune -f
-            """
+            sh "docker image prune -f"
         }
     }
 }
