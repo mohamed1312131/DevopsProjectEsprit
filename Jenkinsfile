@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     stages {
+    stage{
         steps {
                 script {
                     sh '''
@@ -11,7 +12,7 @@ pipeline {
                     '''
                 }
             }
-
+    }
         stage('Build Docker Image') {
             steps {
                 script {
