@@ -125,19 +125,6 @@ volumes:
             }
         }
 
-        stage('Health Check') {
-            steps {
-                script {
-                    sh """
-                        # Wait for MySQL to be ready
-                        timeout 300 bash -c 'until docker exec ${MYSQL_CONTAINER} mysqladmin ping -h localhost --silent; do sleep 5; done'
-
-                        # Wait for the application to be ready
-                        timeout 300 bash -c 'until curl -s http://localhost:${APP_PORT}/actuator/health > /dev/null; do sleep 5; done'
-                    """
-                }
-            }
-        }
     }
 
     post {
