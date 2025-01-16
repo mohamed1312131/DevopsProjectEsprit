@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     environment {
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
         DOCKERHUB_USERNAME = 'mohamedsalahmechergui'
         IMAGE_NAME = 'devops-app'
         IMAGE_VERSION = '0.0.1-20250105.142846-3'
@@ -14,6 +15,77 @@ pipeline {
     }
 
     stages {
+        // Build and Test Stages
+        stage('Build') {
+            steps {
+                sh 'mvn clean compile'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                sh 'mvn test'
+                junit 'target/surefire-reports/*.xml'
+            }
+        }
+
+        stage('JaCoCo Coverage Report') {
+            steps {
+                sh 'mvn verify'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh 'mvn sonar:sonar'
+                }
+            }
+        }
+
+        stage("Build Package") {
+            steps {
+                sh "mvn package -DskipTests"
+            }
+        }
+
+        stage('Deploy to Nexus') {
+            steps {
+                sh "mvn clean deploy -DskipTests"
+            }
+        }
+
+        // Docker Stages
+        stage('Build and Tag Docker Image') {
+            steps {
+                script {
+                    sh """
+                        docker tag devops-app:latest ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:latest
+                        docker tag devops-app:latest ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${IMAGE_VERSION}
+                    """
+                }
+            }
+        }
+
+        stage('Push to DockerHub') {
+            steps {
+                script {
+                    // Login to DockerHub
+                    sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+
+                    // Push images
+                    sh """
+                        docker push ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:latest
+                        docker push ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${IMAGE_VERSION}
+                    """
+
+                    // Logout from DockerHub
+                    sh 'docker logout'
+                }
+            }
+        }
+
+        // Deployment Stages
         stage('Cleanup Previous Deployment') {
             steps {
                 script {
@@ -89,16 +161,6 @@ volumes:
             }
         }
 
-        stage('Tag Image') {
-            steps {
-                script {
-                    sh """
-                        docker tag ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${IMAGE_VERSION} ${IMAGE_NAME}:latest
-                    """
-                }
-            }
-        }
-
         stage('Deploy Application') {
             steps {
                 script {
@@ -127,7 +189,6 @@ volumes:
                         echo "- Bloc API: ${APP_URL}/bloc/findAll"
 
                         # Get response from main URL
-                        echo "Testing main URL response:"
                         curl -v ${APP_URL}
                     """
                 }
@@ -136,15 +197,16 @@ volumes:
     }
 
     post {
+        always {
+            sh "docker image prune -f"
+            echo "Pipeline completed"
+        }
         success {
             echo """
                 Deployment successful!
-
                 Your application is now running!
                 Access it at: ${APP_URL}
                 Test the API at: ${APP_URL}/bloc/findAll
-
-                You can now open these URLs in your web browser.
             """
         }
         failure {
@@ -155,9 +217,6 @@ volumes:
                     docker rm -f ${MYSQL_CONTAINER} ${APP_CONTAINER} || true
                 """
             }
-        }
-        always {
-            sh "docker image prune -f"
         }
     }
 }
