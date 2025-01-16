@@ -2,9 +2,7 @@ package com.example.devops.dao.repositories;
 
 import com.example.devops.dao.entities.Bloc;
 import com.example.devops.dao.entities.Foyer;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
@@ -13,6 +11,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class BlocRepositoryTest {
 
     @Autowired
@@ -21,7 +20,7 @@ class BlocRepositoryTest {
     @BeforeEach
     void setUp() {
         Foyer foyer = Foyer.builder().idFoyer(1L).build();
-        System.out.println("this is generated foyer "+foyer.getIdFoyer());
+        System.out.println("this is generated foyer " + foyer.getIdFoyer());
 
         Bloc bloc1 = Bloc.builder()
                 .nomBloc("Bloc A")
@@ -35,12 +34,14 @@ class BlocRepositoryTest {
         blocRepository.save(bloc1);
         blocRepository.save(bloc2);
     }
+
     @AfterEach
     void tearDown() {
         blocRepository.deleteAll();
     }
 
     @Test
+    @Order(1)
     void selectByNomBJPQL1_ShouldReturnBloc() {
         Bloc result = blocRepository.selectByNomBJPQL1("Bloc A");
         assertNotNull(result);
@@ -49,6 +50,7 @@ class BlocRepositoryTest {
     }
 
     @Test
+    @Order(2)
     void updateBlocJPQL_ShouldUpdateNomBlocForCapacityLessThan10() {
         blocRepository.updateBlocJPQL("Updated Bloc");
         Bloc updatedBloc = blocRepository.findByNomBloc("Updated Bloc");
@@ -57,6 +59,7 @@ class BlocRepositoryTest {
     }
 
     @Test
+    @Order(3)
     void findByCapaciteBlocGreaterThan_ShouldReturnBlocs() {
         List<Bloc> blocs = blocRepository.findByCapaciteBlocGreaterThan(10);
         assertNotNull(blocs);
@@ -64,9 +67,8 @@ class BlocRepositoryTest {
         assertEquals("Bloc B", blocs.get(0).getNomBloc());
     }
 
-
-
     @Test
+    @Order(4)
     void findByNomBlocIgnoreCase_ShouldReturnBloc() {
         List<Bloc> blocs = blocRepository.findByNomBlocIgnoreCase("bloc a");
         assertNotNull(blocs);

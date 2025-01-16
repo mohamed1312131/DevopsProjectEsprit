@@ -5,7 +5,10 @@ import com.example.devops.dao.entities.Chambre;
 import com.example.devops.dao.repositories.BlocRepository;
 import com.example.devops.dao.repositories.ChambreRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -20,18 +23,23 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class BlocServiceTest {
 
-   @Mock private BlocRepository blocRepository;
-    @Mock private ChambreRepository chambreRepository;
+    @Mock
+    private BlocRepository blocRepository;
 
-    @InjectMocks private BlocService blocService;
+    @Mock
+    private ChambreRepository chambreRepository;
 
- // test with order
+    @InjectMocks
+    private BlocService blocService;
+
     @Test
+    @Order(1)
     void testAddOrUpdate() {
         Bloc bloc = new Bloc(1L, "Bloc A", 100L, null, new ArrayList<>());
-        Chambre chambre = new Chambre(1L,2,SIMPLE,null,null);
+        Chambre chambre = new Chambre(1L, 2, SIMPLE, null, null);
         bloc.getChambres().add(chambre);
 
         when(blocRepository.save(bloc)).thenReturn(bloc);
@@ -47,6 +55,7 @@ class BlocServiceTest {
     }
 
     @Test
+    @Order(2)
     void testFindAll() {
         List<Bloc> mockBlocs = List.of(
                 new Bloc(1L, "Bloc A", 100L, null, new ArrayList<>()),
@@ -63,6 +72,7 @@ class BlocServiceTest {
     }
 
     @Test
+    @Order(3)
     void testFindById() {
         Bloc mockBloc = new Bloc(1L, "Bloc A", 100L, null, new ArrayList<>());
         when(blocRepository.findById(1L)).thenReturn(Optional.of(mockBloc));
@@ -75,6 +85,7 @@ class BlocServiceTest {
     }
 
     @Test
+    @Order(4)
     void testFindByIdThrowsException() {
         when(blocRepository.findById(1L)).thenReturn(Optional.empty());
 
@@ -85,6 +96,7 @@ class BlocServiceTest {
     }
 
     @Test
+    @Order(5)
     void testDeleteById() {
         Bloc mockBloc = new Bloc(1L, "Bloc A", 100L, null, new ArrayList<>());
         when(blocRepository.findById(1L)).thenReturn(Optional.of(mockBloc));
@@ -94,8 +106,4 @@ class BlocServiceTest {
         verify(chambreRepository, times(1)).deleteAll(mockBloc.getChambres());
         verify(blocRepository, times(1)).delete(mockBloc);
     }
-
-
-
-
 }
