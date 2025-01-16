@@ -16,44 +16,48 @@ pipeline {
 
     stages {
         // Build and Test Stages
-        stage('Build') {
-            steps {
-                sh 'mvn clean compile'
-            }
-        }
-
-        stage('Run Tests') {
-            steps {
-                sh 'mvn test'
-                junit 'target/surefire-reports/*.xml'
-            }
-        }
-
-        stage('JaCoCo Coverage Report') {
-            steps {
-                sh 'mvn verify'
-            }
-        }
-
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh 'mvn sonar:sonar'
+                stage('Build') {
+                    steps {
+                        sh 'mvn clean compile'
+                    }
                 }
-            }
-        }
 
-        stage("Build Package") {
-            steps {
-                sh "mvn package -DskipTests"
-            }
-        }
+                stage('Run Tests') {
+                    steps {
 
-        stage('Deploy to Nexus') {
-            steps {
-                sh "mvn clean deploy -DskipTests"
-            }
-        }
+                        sh 'mvn test'
+
+                        junit 'target/surefire-reports/*.xml'
+
+                    }
+                }
+                stage('JaCoCo Coverage Report') {
+                            steps {
+                                sh 'mvn verify'
+                            }
+                        }
+
+                stage('SonarQube Analysis') {
+                    steps {
+                        withSonarQubeEnv('SonarQube') {
+                            sh 'mvn sonar:sonar'
+                        }
+                    }
+                }
+                stage("mvn build") {
+                            steps {
+                                script {
+                                    sh "mvn package -DskipTests"
+                                }
+                            }
+                }
+                       stage('Deploy to Nexus') {
+                            steps {
+                                script {
+                                    sh "mvn clean deploy -DskipTests"
+                                }
+                            }
+                        }
 
         // Docker Stages
         stage('Build and Tag Docker Image') {
